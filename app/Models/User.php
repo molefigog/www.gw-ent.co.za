@@ -17,13 +17,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class User extends Authenticatable implements MustVerifyEmail, FilamentUser, HasAvatar
+class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {
     use HasApiTokens;
     use HasFactory;
-    use HasProfilePhoto;
     use Notifiable;
-    use TwoFactorAuthenticatable;
+
 
     /**
      * The attributes that are mass assignable.
@@ -52,7 +51,6 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser, Has
      * @var array<int, string>
      */
     protected $appends = [
-        'profile_photo_url',
         'avatar_url',
     ];
     public function canAccessPanel(Panel $panel): bool
@@ -66,7 +64,8 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser, Has
             'password',
             'balance',
             'mobile_number',
-            'avatar'
+            'avatar',
+            'facebook_id'
         ];
 
 

@@ -1,7 +1,7 @@
-@extends('welcome')
+@extends('layouts.master')
 
 @section('content')
-    
+
     <div class="articles">
         @forelse($beats as $beat)
         <div class="article-card">

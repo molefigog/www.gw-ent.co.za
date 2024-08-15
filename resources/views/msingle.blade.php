@@ -318,7 +318,7 @@
     }
 </script>
 
-    <script>
+    {{-- <script>
         document.getElementById('buyNowForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent form submission
 
@@ -359,7 +359,54 @@
                 });
             }
         });
+    </script> --}}
+    <script>
+        document.getElementById('buyNowForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            var form = this;
+            var userId = document.getElementsByName('custom')[0].value;
+
+            if (!userId) {
+                var intendedUrl = '{{ route('msingle.slug', ['slug' => urlencode($music->slug)]) }}';
+                window.sessionStorage.setItem('intended_url', intendedUrl);
+
+                // Open the modal instead of redirecting to login
+                var modalElement = document.querySelector('.bs-example-modal-center');
+                var bootstrapModal = new bootstrap.Modal(modalElement);
+                bootstrapModal.show();
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route('check-music-file') }}',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        musicId: '{{ $music->id }}'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            form.submit(); // Submit the form if the file exists
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message,
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Music File Not found',
+                        });
+                    },
+                });
+            }
+        });
     </script>
+
 @endpush
 @push('mpesa')
     {{-- <script>

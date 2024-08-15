@@ -62,7 +62,7 @@
     $artists = App\Models\User::orderBy('name')->get();
 @endphp --}}
 
-<body data-topbar="light" data-layout="horizontal">
+<body data-topbar="dark" data-bs-theme="dark"data-layout="horizontal">
     <!-- Begin page -->
     <div id="layout-wrapper">
 
@@ -74,6 +74,7 @@
                 <div class="container-fluid text-center">
                     @yield('content')
                     @include('layouts.modal')
+                    @include('songs.songs')
                 </div> <!-- container-fluid -->
             </div>
             <!-- End Page-content -->
@@ -197,26 +198,24 @@
             notyf.success(message);
         }
     </script> --}}
-    @if (session('error'))
     <script>
-        var errorMessage = "{{ session('error') }}";
-    </script>
-@endif
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            @if (session('error'))
-                var notyf = new Notyf({
-                    duration: 9000, // Duration in milliseconds
-                    dismissible: true,
-                    position: {
-                        x: 'center', // Position on the x-axis
-                        y: 'top', // Position on the y-axis
-                    }
-                });
-                notyf.error(errorMessage);
-            @endif
-        });
-    </script>
+        window.addEventListener('success2', event => {
+
+            showNotification2('downloading....');
+        })
+
+        function showNotification2(message) {
+            var notyf = new Notyf({
+                duration: 9000, // Duration in milliseconds
+                dismissible: true,
+                position: {
+                    x: 'center', // Position on the x-axis
+                    y: 'top', // Position on the y-axis
+                }
+            });
+            notyf.success(message);
+        }
+</script>
 <script>
         window.addEventListener('paymentFailed', event => {
 

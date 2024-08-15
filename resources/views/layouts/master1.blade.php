@@ -46,13 +46,15 @@
     background-color: #353e53;
 }
     </style>
+@livewireStyles
+
 </head>
 
 {{-- @php
     $artists = App\Models\User::orderBy('name')->get();
 @endphp --}}
 
-<body data-topbar="light" data-layout="horizontal">
+<body data-topbar="dark" data-bs-theme="dark"data-layout="horizontal">
     <!-- Begin page -->
     <div id="layout-wrapper">
 
@@ -64,12 +66,12 @@
                 <div class="container-fluid text-center">
                     {{ $slot }}
                     @include('layouts.modal')
+
                 </div> <!-- container-fluid -->
             </div>
             <!-- End Page-content -->
 
             @yield('audio')
-            <p class="text center">Select Songs By Artist</p>
 
             <footer class="footer">
                 <div class="container-fluid">

@@ -26,9 +26,9 @@ class Register extends BaseRegister
                         ->schema([
                             $this->getNameFormComponent(),
                             PhoneInput::make('mobile_number')->unique(User::class)
-                            ->ipLookup(function () {
-                                return rescue(fn () => Http::get('https://ipinfo.io/json')->json('country'), app()->getLocale(), report: false);
-                            }),
+                                ->ipLookup(function () {
+                                    return rescue(fn() => Http::get('https://ipinfo.io/json')->json('country'), app()->getLocale(), report: false);
+                                }),
                             $this->getEmailFormComponent()->columnSpanFull(),
                         ]),
                     Wizard\Step::make('Avatar')
@@ -59,8 +59,10 @@ class Register extends BaseRegister
         return [];
     }
 
-    protected function registered(Request $request, $user)
+    protected function getRedirectUrl(): string
     {
-        return redirect('/');
+        $url = ('/');
+
+        return $url;
     }
 }

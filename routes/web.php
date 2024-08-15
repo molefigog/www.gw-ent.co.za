@@ -26,24 +26,13 @@ use App\Http\Controllers\PurchasedMusicController;
 use Carbon\Carbon;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\BookingController;
 use App\Livewire\Mmino;
 use App\Livewire\ShowMusic;
 use App\Http\Controllers\SocialShareController;
 use App\Http\Controllers\MpesaController;
+use App\Http\Controllers\SpotifyController;
 
-
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        // Check if there is an intended route, otherwise redirect to a default route
-        return redirect()->intended('/');
-    })->name('dashboard');
-});
 Route::get('/cancel', function () {
     return view('paypal.cancel');
 });
@@ -113,10 +102,9 @@ Route::post('/send-sms1', [SMSController::class, 'sendSMS2'])->name('send-sms-se
 Route::get('music/download/{mp3}', [MusicController::class, 'downloadMp3'])->name('mp3.download');
 Route::get('music/download/{music}', [MpesaController::class, 'downloadSong'])->name('music.download');
 Route::get('download/{beat}', [MpesaController::class, 'downloadBeat'])->name('beat.download');
-// Route::get('/music/download/{music}', [MusicController::class, 'download'])
-//     ->name('music.download')
-//     ->middleware('check.download.validity');
 
+
+Route::get('/bookings/artist/{artistName}', [BookingController::class, 'showArtistBookings'])->name('bookings.artist');
 
 
 Route::post('/manual', [TopUpController::class, 'processOrder'])->name('manual');
@@ -184,3 +172,23 @@ Route::group(['middleware' => 'auth'], function () {
 Route::get('/google/redirect', [App\Http\Controllers\GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('/google/callback', [App\Http\Controllers\GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
 
+Route::prefix('facebook')->name('facebook.')->group( function(){
+    Route::get('auth', [App\Http\Controllers\FaceBookController::class, 'loginUsingFacebook'])->name('login');
+    Route::get('callback', [App\Http\Controllers\FaceBookController::class, 'callbackFromFacebook'])->name('callback');
+});
+// routes/web.php
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+});
+// routes/web.php
+Route::get('/generate-pdf/{artistId}', [BookingController::class, 'generatePdf'])->name('generate.pdf');
+// routes/web.php
+
+
+Route::get('spotify/redirect', [SpotifyController::class, 'redirectToSpotify'])->name('spotify.redirect');
+Route::get('callback', [SpotifyController::class, 'handleCallback'])->name('spotify.callback');
+Route::get('songs', [SpotifyController::class, 'getSongs'])->name('songs.index');
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

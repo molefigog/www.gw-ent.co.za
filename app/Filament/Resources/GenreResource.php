@@ -34,7 +34,7 @@ class GenreResource extends Resource
 
                 TextInput::make('title'),
 
-                FileUpload::make('image')->preserveFilenames()->maxSize(512)->disk('public')
+                FileUpload::make('image')->directory('images')->maxSize(512)->disk('public')
     ->directory('images'),
 
              ])->Columns(2),

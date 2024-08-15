@@ -1,4 +1,4 @@
-{{-- @extends('welcome')
+{{-- @extends('master')
 
 @section('content') --}}
     <div id="music-list" class="articles">

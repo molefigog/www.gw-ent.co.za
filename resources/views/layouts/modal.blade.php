@@ -114,7 +114,7 @@ aria-labelledby="mySmallModalLabel" aria-hidden="true">
                         <div class="input-group has-validation mb-3">
                             <span class="input-group-text"><i class="ion ion-md-mail"></i></span>
                             <div class="form-floating">
-                              <input type="email"  name="email" class="form-control" id="floatingInputGroup2" value="{{old('email')}}" placeholder="Email" required autocomplete="login" autofocus>
+                              <input type="email"  name="login" class="form-control" id="floatingInputGroup2" value="{{old('email')}}" placeholder="Email" required autocomplete="login" autofocus>
                               <label for="floatingInputGroup2">Email address</label>
                             </div>
                             @error('login')
@@ -165,6 +165,10 @@ aria-labelledby="mySmallModalLabel" aria-hidden="true">
                     </form>
                     <hr>
                     <a href="{{ route('google.redirect') }}" class="btn btn-primary btn-sm text-center"><i class="fab fa-google"></i>  Login with Google </a>
+                    {{-- <a href="{{ route('facebook.login') }}" class="btn btn-primary btn-sm text-center">
+                        <i class="fab fa-facebook-f fa-fw"></i>
+                        Login with Facebook
+                     </a> --}}
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -174,7 +178,19 @@ aria-labelledby="mySmallModalLabel" aria-hidden="true">
     <!-- /.modal -->
 </div>
 
+@auth
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
+            @livewire('cashout')
+
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+@endauth
 <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">

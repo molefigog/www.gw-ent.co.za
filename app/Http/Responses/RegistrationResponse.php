@@ -10,6 +10,14 @@ class RegistrationResponse implements Responsable
     public function toResponse($request): RedirectResponse
     {
         Log::info('RegistrationResponse toResponse called');
-        return redirect()->route('gee');
+        $intendedUrl = session('intended_url');
+
+        if ($intendedUrl) {
+            // Clear the intended URL from the session
+            session()->forget('intended_url');
+            return redirect()->to($intendedUrl); // Ensure this returns a RedirectResponse
+        }
+
+        return redirect()->intended(url('/')); // This should already be correct
     }
 }

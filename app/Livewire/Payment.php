@@ -81,6 +81,7 @@ class Payment extends Component
                 if ($verificationData['status_code'] === 'INS-0') {
                     $this->updateUserBalance($this->musicId, $this->amount);
                     $this->userMusic();
+                    $this->dispatch('success2');
                     return $this->downloadSong($this->musicId);
                 } else {
                     session()->flash('error', 'Transaction verification failed');

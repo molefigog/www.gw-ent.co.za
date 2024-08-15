@@ -39,7 +39,7 @@ class CreateMusic extends CreateRecord
             Step::make('Genre')
             ->description('Add Genre and Price')
             ->schema([
-                Select::make('amount')->label('price')
+                Select::make('amount')->label('price')->required()
                     ->options([
                         '8' => 'R8',
                         '10' => 'R10',
@@ -51,7 +51,7 @@ class CreateMusic extends CreateRecord
                 Select::make('genre_id')
                     ->label('Genre')
                     ->options(Genre::all()->pluck('title', 'id'))
-                    ->searchable(),
+                    ->searchable()->required(),
             ]),
         Step::make('Description')
             ->description('Add Short Note')
@@ -64,9 +64,9 @@ class CreateMusic extends CreateRecord
             ->schema([
                  FileUpload::make('image')->maxSize(512)
                  ->disk('public')->directory('images')
-                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif']),
+                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])->required(),
                  FileUpload::make('file')->preserveFilenames()
-                      ->acceptedFileTypes(['audio/mpeg', 'audio/mp3'])->maxSize(10024),
+                      ->acceptedFileTypes(['audio/mpeg', 'audio/mp3'])->maxSize(10024)->required(),
             ]),
     ];
 }

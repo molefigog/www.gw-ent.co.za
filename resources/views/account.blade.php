@@ -1,152 +1,106 @@
 @php
-$apiKey = '863c6f17965b59a056305e51';
-$baseCurrency = 'ZAR';
-$targetCurrency = 'USD';
-$amount = '100';
-$apiUrl = "https://open.er-api.com/v6/latest/{$baseCurrency}?apikey={$apiKey}";
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-$response = curl_exec($ch);
-curl_close($ch);
-$data = json_decode($response, true);
-if ($data && isset($data['rates'][$targetCurrency])) {
-// Perform the conversion
-$exchangeRate = $data['rates'][$targetCurrency];
-$convertedAmount = $amount * $exchangeRate;
-$convertedAmount = round($convertedAmount, 2);
-$amount = $convertedAmount;
-} else {
-$amount = 'Failed to retrieve exchange rate data.';
-}
-$Paypal = config('paypal.paypal_url');
-$PAYPAL_ID = config('paypal.paypal_id');
-$currency = config('paypal.paypal_currency');
-$upload_fee = '100';
-$user = auth()->user();
-$songs = $user->musics;
+
+    $user = auth()->user();
+    $songs = $user->musics;
 @endphp
 
 @auth
-<style>
-    #text {
-        font-weight: bold;
-        font-size: 12px;
-        animation-name: blink;
-        animation-duration: 3s;
-        animation-iteration-count: infinite;
-    }
 
-    @keyframes blink {
-        0% {
-            color: pink
-        }
-
-        50% {
-            color: black;
-        }
-
-        100% {
-            color: pink;
-        }
-    }
-</style>
 <div class="max-w-4xl mx-auto flex justify-center items-center h-full">
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-        @if (Auth::user()->upload_status == 1)
-
-        <h6 class="text-center">account Wallet</h6>
+        <h6 class="text-center">Account Wallet</h6>
 
         @if ($songs && $songs->count() > 0)
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3">
-                        #
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        <div class="flex items-center">
-                            Tracks
-                        </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        <div class="flex items-center">
-                            MD
-                        </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        <div class="flex items-center">
-                            Price
-                        </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        <div class="flex items-center">
-                            Total
-                        </div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                $grandTotal = 0;
-                @endphp
+            <table class="fi-ta-table w-full table-auto divide-y divide-gray-200 text-start dark:divide-white/5">
+                <thead class="divide-y divide-gray-200 dark:divide-white/5">
+                    <tr>
+                        <th class="fi-ta-header-cell px-3 py-3.5 sm:first-of-type:ps-6 sm:last-of-type:pe-6 fi-table-header-cell-title">
+                            #
+                        </th>
+                        <th class="fi-ta-header-cell px-3 py-3.5 sm:first-of-type:ps-6 sm:last-of-type:pe-6 fi-table-header-cell-title">
+                            <div class="flex items-center">
+                                Tracks
+                            </div>
+                        </th>
+                        <th class="fi-ta-header-cell px-3 py-3.5 sm:first-of-type:ps-6 sm:last-of-type:pe-6 fi-table-header-cell-title">
+                            <div class="flex items-center">
+                                MD
+                            </div>
+                        </th>
+                        <th class="fi-ta-header-cell px-3 py-3.5 sm:first-of-type:ps-6 sm:last-of-type:pe-6 fi-table-header-cell-title">
+                            <div class="flex items-center">
+                                Price
+                            </div>
+                        </th>
+                        <th class="fi-ta-header-cell px-3 py-3.5 sm:first-of-type:ps-6 sm:last-of-type:pe-6 fi-table-header-cell-title">
+                            <div class="flex items-center">
+                                Total
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 whitespace-nowrap dark:divide-white/5">
+                    @php
+                        $grandTotal = 0;
+                    @endphp
 
-                @foreach ($songs as $index => $song)
-                @php
-                $total = $song->md * $song->amount;
-                $grandTotal += $total;
-                @endphp
-                <tr class="bg-white border-b">
-                    
-                    <td class="px-6 py-4">
-                        {{ $index + 1 }}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{ $song->title }}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{ $song->md }}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{ $song->amount }}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{ $total }}
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        <hr class="">
-        <h6 class="text-center">{{ Auth::user()->name }} You have <strong>
-                R{{ $grandTotal }} </strong>
-            <script>
-                var currentDate = new Date();
-                var currentMonthIndex = currentDate.getMonth();
-                var currentYear = currentDate.getFullYear();
+                    @foreach ($songs as $index => $song)
+                        @php
+                            $total = $song->md * $song->amount;
+                            $grandTotal += $total;
+                        @endphp
+                        <tr class="bg-gray-50 dark:bg-white/5">
+                            <td class="fi-ta-cell p-0 first-of-type:ps-1 last-of-type:pe-1 sm:first-of-type:ps-3 sm:last-of-type:pe-3 fi-table-cell-title">
+                                {{ $index + 1 }}
+                            </td>
+                            <td class="fi-ta-cell p-0 first-of-type:ps-1 last-of-type:pe-1 sm:first-of-type:ps-3 sm:last-of-type:pe-3 fi-table-cell-title">
+                                {{ $song->title }}
+                            </td>
+                            <td class="fi-ta-cell p-0 first-of-type:ps-1 last-of-type:pe-1 sm:first-of-type:ps-3 sm:last-of-type:pe-3 fi-table-cell-title">
+                                {{ $song->md }}
+                            </td>
+                            <td class="fi-ta-cell p-0 first-of-type:ps-1 last-of-type:pe-1 sm:first-of-type:ps-3 sm:last-of-type:pe-3 fi-table-cell-title">
+                                {{ $song->amount }}
+                            </td>
+                            <td class="fi-ta-cell p-0 first-of-type:ps-1 last-of-type:pe-1 sm:first-of-type:ps-3 sm:last-of-type:pe-3 fi-table-cell-title">
+                                {{ $total }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <hr class="">
+            <h6 class="text-center">{{ Auth::user()->name }} You have <strong>
+                    R{{ $grandTotal }} </strong>
+                <script>
+                    var currentDate = new Date();
+                    var currentMonthIndex = currentDate.getMonth();
+                    var currentYear = currentDate.getFullYear();
 
-                // Array of month names
-                var monthNames = [
-                    "January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"
-                ];
+                    var monthNames = [
+                        "January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"
+                    ];
 
-                var currentMonthName = monthNames[currentMonthIndex];
+                    var currentMonthName = monthNames[currentMonthIndex];
 
-                document.write("this " + currentMonthName + " " + currentYear);
-            </script>
-        </h6>
-        <p class="text-muted text-center">
-            md -> monthly downloads
-            <br>
-            md x amount = total
-        </p>
-        <hr>
+                    document.write("this " + currentMonthName + " " + currentYear);
+                </script>
+            </h6>
+            <p>
+                md -> monthly downloads
+                <br>
+                md x amount = total
+            </p>
+            <hr>
         @else
-        <p class="text-center">No songs found.</p>
-        @endif
+            <p class="text-center">No songs found.</p>
         @endif
     </div>
 </div>
+
+
+
+
 
 @endauth

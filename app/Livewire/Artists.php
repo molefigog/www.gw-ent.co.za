@@ -24,7 +24,6 @@ class Artists extends Component
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-
     public $artistName;
     public $artist;
     public $genres;
@@ -36,25 +35,16 @@ class Artists extends Component
     public $image;
     public $music;
     public $musicCollection;
-    public $search = '';  // Add search property
-
+    public $search = '';
     public function mount($artistName)
     {
         $this->artistName = $artistName;
         $this->loadData($artistName);
     }
-
-
-
     public function loadData($artistName)
-    {// Convert hyphens back to spaces
+    {
     $decodedArtistName = str_replace('_', ' ', $artistName);
-
-    // Log::info('Decoded Artist Name: ' . $decodedArtistName); // Log the decoded artist name
-
-    // Perform the query with the decoded artist name
     $this->artist = User::where('name', $decodedArtistName)->firstOrFail();
-
     if (!$this->artist) {
         Log::error('No artist found with name: ' . $decodedArtistName);
         abort(404, 'Artist not found.');
@@ -62,50 +52,36 @@ class Artists extends Component
         $query = DB::table('music_user')
             ->where('user_id', $this->artist->id)
             ->join('music', 'music_user.music_id', '=', 'music.id');
-
-
         $musicCollection = $query->latest('music.created_at')
             ->paginate(10);
-
         $this->genres = Genre::withCount('music')
             ->latest()
             ->take(10)
             ->get();
-
         $this->setting = Setting::firstOrFail();
         $this->appName = config('app.name');
         $this->url = config('app.url');
-
         $this->keywords = "GW ENT, genius Works ent, KS, K Fire, K-Fire, Elliotgog, GOG";
-
         $this->musicCount = $musicCollection->total();
-
         if ($musicCollection->isNotEmpty()) {
             $lastMusic = $musicCollection->last();
             $this->image = asset('storage/' . $lastMusic->image);
         }
-
         $this->musicCollection = $musicCollection->items(); // Convert to array
     }
-
     public function incrementLikes(Request $request, $musicId)
     {
         $this->music = Music::findOrFail($musicId);
         $this->music->increment('likes');
         $this->music->save();
     }
-
     public function render()
     {
-
-
         return view('livewire.artists', [
             'musicCollection' => $this->musicCollection,
             'artist' => $this->artist,
             'genres' => $this->genres,
             'metaTags' => $this->keywords
-
         ]);
     }
-
 }

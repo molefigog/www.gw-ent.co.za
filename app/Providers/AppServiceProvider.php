@@ -13,8 +13,10 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Http\Responses\LogoutResponse;
 use Filament\Http\Responses\Auth\Contracts\LogoutResponse as LogoutResponseContract;
-use App\Http\Responses\RegistrationResponse;
-use Filament\Http\Responses\Auth\Contracts\RegistrationResponse as RegistrationResponseContract;
+// use App\Http\Responses\RegistrationResponse;
+// use Filament\Http\Responses\Auth\Contracts\RegistrationResponse as RegistrationResponseContract;
+use App\Http\Responses\LoginResponse;
+use Filament\Http\Responses\Auth\Contracts\LoginResponse as LoginResponseContract;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,7 +26,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(LogoutResponseContract::class, LogoutResponse::class);
-        $this->app->bind(RegistrationResponseContract::class, RegistrationResponse::class);
+        // $this->app->bind(RegistrationResponseContract::class, RegistrationResponse::class);
+        $this->app->bind(LoginResponseContract::class, LoginResponse::class);
     }
 
     /**

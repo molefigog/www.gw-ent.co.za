@@ -25,6 +25,8 @@ use Filament\View\PanelsRenderHook;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Register;
 use Filament\Enums\ThemeMode;
+use App\Filament\Pages\FilamentInfoWidget;
+use App\Filament\Widgets\AccountWidget;
 class AdminPanelProvider extends PanelProvider
 {
 
@@ -51,6 +53,7 @@ class AdminPanelProvider extends PanelProvider
                 ->url('/top-up')
                 ->icon('heroicon-o-user'),
             ])
+
             ->brandLogo( $setting->logo_url)
             ->favicon( $setting->favicon_url )
             // ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
@@ -63,7 +66,8 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                FilamentInfoWidget::class,
+                // AccountWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

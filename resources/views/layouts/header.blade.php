@@ -44,22 +44,23 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
-                        <a class="dropdown-item" href="#"><i
-                                class="mdi mdi-account-circle font-size-17 align-middle me-1"></i> Profile</a>
-                        <a class="dropdown-item" href="#">
-                            <span class="badge bg-success float-end">R{{ Auth::user()->balance }}</span>
-                            <i class="mdi mdi-wallet font-size-17 align-middle me-1"></i>Credits
+                        <a class="dropdown-item" href="{{ url('/admin/profile') }}"><i
+                                class="mdi mdi-account-circle font-size-17 align-middle me-1"></i> Profile
+
+                        </a>
+                        <a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            {{-- <span class="badge bg-success float-end"></span> --}}
+                            <i class="mdi mdi-wallet font-size-17 align-middle me-1"></i>R{{ Auth::user()->balance }}
                         </a>
 
-                        <a class="dropdown-item d-block" href="#">
+                        <a class="dropdown-item d-block" href="{{ url('/admin/music/create') }}">
 
 
                             <i class="mdi mdi-upload font-size-17 align-middle me-1"></i>
                             Upload
                         </a>
-                        <a class="dropdown-item" href="{{ url('/admin/music/create') }}">
-                            <i class="mdi mdi-lock-open-outline font-size-17 align-middle me-1"></i> Lock
-                            screen
+                        <a class="dropdown-item" href="{{ url('/admin/bookings') }}">
+                            <i class="mdi mdi-lock-open-outline font-size-17 align-middle me-1"></i> Bookings
                         </a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item text-danger" href="{{ route('logout') }}"

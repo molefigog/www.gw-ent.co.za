@@ -172,7 +172,8 @@
             <a href="#" class="" onclick="copyToClipboard2()"><i class="fas fa-copy"></i></a>
         </div>
         <div class="flex justify-content-center">
-            <a class="btn btn-outline-info btn-sm" href="">Bookings</a>
+            <a class="btn btn-outline-info btn-sm" href="{{ route('bookings.artist', ['artistName' => str_replace(' ', '_', $artist['name'])]) }}">Bookings</a>
+
             @auth
             <a class="btn btn-outline-info btn-sm" href="">WithDraw</a>
             @endauth
@@ -455,14 +456,7 @@
             });
         </script>
         <script>
-            function copyToClipboard() {
-                const url = '{{ $url1 }}';
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('URL copied to clipboard!');
-                }).catch(err => {
-                    console.error('Could not copy text: ', err);
-                });
-            }
+
 
             function copyToClipboard2() {
                 const url = '{{$base}}' + '{{ $url3 }}'; // Replace with your actual URL
