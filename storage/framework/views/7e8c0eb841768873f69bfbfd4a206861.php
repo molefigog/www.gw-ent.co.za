@@ -60,7 +60,8 @@
         <?php echo $__env->make('layouts.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
         <div class="main-content">
-
+            <hr>
+            <br>
             <div class="page-content">
                 <div class="container-fluid text-center">
                     <?php echo e($slot); ?>
@@ -153,7 +154,7 @@
     <script src="<?php echo e(asset('assets/libs/node-waves/waves.min.js')); ?>"></script>
     <!-- Peity chart-->
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="<?php echo e(asset('assets/libs/peity/jquery.peity.min.js')); ?>"></script>
     <script>
         const BootstrapMin = "<?php echo e(asset('assets/css/bootstrap.min.css')); ?>";

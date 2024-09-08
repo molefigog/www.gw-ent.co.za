@@ -86,9 +86,9 @@
             transform: scale(0.8);
         }
 
-        .price {
+        /* .price {
             padding: 8px 0px;
-        }
+        } */
 
 
 
@@ -154,7 +154,18 @@
                 height: 10%;
             }
         }
+
+        .dim {
+            background: #ff2950a9;
+            color: #fcfcfc;
+            text-shadow: -1px -1px 0px var(--background),
+                3px 3px 0px var(--background),
+                6px 6px 0px #00000055;
+        }
     </style>
+    <br>
+    <hr>
+
     <div class="row g-2">
         <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $allMusic; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $music): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <div wire:key="<?php echo e($music->id); ?>" class="col-6 col-md-2">
@@ -166,17 +177,28 @@
                             onclick="fetchTrackData(this);">
                             <i class="dripicons-media-play icon-size"></i>
                         </div>
-                        <a href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
-                            <h6 class="price">R<?php echo e($music->amount ?? '-'); ?>.00</h6>
+                        <a class="btn btn-outline-light waves-effect waves-light btn-sm dim" style="height:28px;"
+                            href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
+                            <strong class="price" style="padding: 0px 10px;">R<?php echo e($music->amount ?? '-'); ?>.00</strong>
                         </a>
                         <div class="dropup-center dropup price">
-                            <a class="text-dark" href="#" role="button" data-bs-toggle="dropdown"
+                            <a class="btn btn-outline-light waves-effect waves-light btn-sm dim my-6" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
                                 <i class="fas fa-ellipsis-v"></i>
                             </a>
 
                             <ul class="dropdown-menu">
-                                
+                                <li><a class="dropdown-item" href="#"><i class="far fa-clock"></i> <?php echo e($music->duration); ?></a></li>
+                                <li><a class="dropdown-item" href="#"><i class="far fa-file-audio"></i>  <?php echo e($music->size); ?>MB</a></li>
+                                <li>
+                                    <button style="font-size: 9px; margin-right: 4px;"
+                                        class="dropdown-item"
+                                        wire:click="incrementLikes(<?php echo e($music->id); ?>)">
+                                        <span style="color: #007bff;">
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                            <?php echo e($music->likes); ?></span>
+                                    </button>
+                                </li>
                             </ul>
                         </div>
 
@@ -193,17 +215,15 @@
                     </div>
                     <?php
                         $baseUrl = config('app.url');
-                        $url1 = "{$baseUrl}/msingle/{$music->slug}";
-                        $shareButtons = \Share::page($url1, 'Check out this music: ' . $music->title)
+                        $url = "{$baseUrl}/msingle/{$music->slug}";
+                        $shareButtons = \Share::page($url, 'Check out this music: ' . $music->title)
                             ->facebook()
                             ->twitter()
                             ->whatsapp();
                     ?>
                     <div class="cardfooter">
                         <div class="social-icons">
-                            <a><i class="fas fa-eye"></i> </a>
 
-                            <a><i class="fas fa-clock"></i> </a>
                             <div class="dropup-center dropup">
 
                                 <a class="" href="#" role="button" data-bs-toggle="dropdown"
@@ -236,7 +256,7 @@
     <?php
         $setting = App\Models\Setting::firstOrFail();
         $appName = config('app.name');
-        $url = config('app.url');
+        $home = config('app.url');
 
         $title = $setting ? $setting->site : $appName;
         $image = asset("storage/$setting->image");
@@ -248,8 +268,8 @@
         <meta property="og:title" content="<?php echo e($title); ?>">
         <meta property="og:image" content="<?php echo e($image); ?>">
         <meta property="og:description" content="<?php echo e($setting->description); ?>">
-        <meta property="og:url" content="<?php echo e($url); ?>" />
-        <link rel="canonical" href="<?php echo e($url1); ?>">
+        <meta property="og:url" content="<?php echo e($home); ?>" />
+        <link rel="canonical" href="<?php echo e($home); ?>">
         <meta name="keywords" content="<?php echo e($keywords); ?>">
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="<?php echo e($title); ?>" />
@@ -260,6 +280,7 @@
 
     <?php $__env->startPush('player'); ?>
         <script src="<?php echo e(asset('assets/js/mediaelement-and-player.js')); ?>"></script>
+
         
         <script>
             var trackPlaying = '',
@@ -276,10 +297,14 @@
             });
 
             function changeAudio(sourceUrl, posterUrl, trackTitle, trackSinger, playAudio = true) {
+                console.log("Changing audio to:", sourceUrl);
                 var audio = $("#audio-player"),
                     clickEl = jQuery('[data-track="' + sourceUrl + '"]'),
                     playerId = audio.closest('.mejs__container').attr('id'),
                     playerObject = mejs.players[playerId];
+
+                console.log("Clicked Element:", clickEl);
+                console.log("Player Object:", playerObject);
 
                 if (!playerObject) {
                     console.error('Player object not found for playerId:', playerId);
@@ -292,9 +317,11 @@
                     if (playerObject.paused) {
                         playerObject.play();
                         clickEl.find('i').removeClass('dripicons-media-play').addClass('dripicons-media-pause');
+                        console.log("Playing track.");
                     } else {
                         playerObject.pause();
                         clickEl.find('i').removeClass('dripicons-media-pause').addClass('dripicons-media-play');
+                        console.log("Pausing track.");
                     }
                     return true;
                 }
@@ -317,6 +344,7 @@
                 if (playAudio == true) {
                     playerObject.play();
                     jQuery(clickEl).find('i').removeClass('dripicons-media-play').addClass('dripicons-media-pause');
+                    console.log("Playing new track.");
                 }
             }
 
@@ -403,13 +431,29 @@
                 hideDivIfNoAudio();
             });
         </script>
+
         <script>
             function copyToClipboard() {
-                const url = '<?php echo e($url1); ?>';
+                const url = '<?php echo e($url); ?>'; // Replace with your actual URL
+                console.log('Attempting to copy:', url); // Debugging line
                 navigator.clipboard.writeText(url).then(() => {
-                    alert('URL copied to clipboard!');
+                    console.log('Copy successful'); // Debugging line
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'URL copied to clipboard!',
+                        input: "text",
+                        inputValue: url,
+                        timer: 15000,
+                        showConfirmButton: false
+                    });
                 }).catch(err => {
-                    console.error('Could not copy text: ', err);
+                    console.error('Could not copy text:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Could not copy URL!',
+                    });
                 });
             }
         </script>
@@ -429,7 +473,7 @@
     <?php $__env->stopSection(); ?>
 
     <?php $__env->startSection('search'); ?>
-    <?php
+        <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };

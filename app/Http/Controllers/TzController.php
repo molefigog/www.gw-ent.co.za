@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use phpseclib3\Crypt\PublicKeyLoader;
+use Illuminate\Support\Facades\Log;
 
 class TzController extends Controller
 {
@@ -24,6 +25,42 @@ class TzController extends Controller
             'encryptSessionKey' => true,
             'rules' => []
         ],
+        'b2c' => [
+            'name' => 'Business 2 Consumer',
+            'url' => "b2cPayment/",
+            'encryptSessionKey' => true,
+            'rules' => []
+        ],
+
+        'b2b' => [
+            'name' => 'Business 2 Business',
+            'url' => "b2bPayment/",
+            'encryptSessionKey' => true,
+            'rules' => []
+        ],
+        'rt' => [
+            'name' => 'Reverse Transaction',
+            'url' => "reversal/",
+            'encryptSessionKey' => true,
+            'rules' => []
+        ],
+        'query' => [
+            'name' => 'Query Transaction Status',
+            'url' => "queryTransactionStatus/",
+            'encryptSessionKey' => true,
+            'rules' => []
+        ],
+        'ddc' => [
+            'name' => 'Direct Debits create',
+            'url' => "directDebitCreation/",
+            'encryptSessionKey' => true,
+            'rules' => []
+        ],
+        'ddp' => [
+            'name' => 'Direct Debits payment',
+            'url' => "directDebitPayment/",
+            'encryptSessionKey' => false,
+        ]
     ];
     public function __construct(array $options, $client = null)
     {
@@ -155,28 +192,102 @@ class TzController extends Controller
         $responseData = json_decode($response->getBody(), true);
 
     // Log the response
-    \Log::info('Response from c2b API:', $responseData);
+    Log::info('Response from c2b API:', $responseData);
 
     return $responseData;
     }
-    public function charge()
+    public function b2c($data, $session = null)
     {
-        $data = [
-            'input_Amount' => 5000, // Amount to be charged
-            'input_Country' => 'LES',
-            'input_Currency' => 'LSL',
-            'input_CustomerMSISDN' => '59073443', // replace with your phone number
-            'input_ServiceProviderCode' => '51909', // replace with your service provider code given by M-Pesa
-            'input_ThirdPartyConversationID' => 'rasderekf', // unique
-            'input_TransactionReference' => 'asdodfdferre', // unique
-            'input_PurchasedItemsDesc' => 'Test Item'
-        ];
+        $sessionToken = $this->getSessionToken($session);
+
+        $token = $this->encryptKey($sessionToken);
+
+        $transData = $this->makeRequestData($data);
+
+        $url = self::TRANSACT_TYPE['b2c']['url']; // Capture the URL
 
         try {
-            $response = $this->c2b($data);
-            return response()->json($response, 200);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            $response = $this->client->post($url, [
+                'json' => $transData,
+                'headers' => ['Authorization' => "Bearer {$token}"]
+            ]);
+            $responseData = json_decode($response->getBody(), true) ?? [];
+
+            Log::info('Response from b2c API:', [
+                'url' => $url, // Log the URL
+                'response' => $responseData
+            ]);
+
+            return $responseData;
+        } catch (\Exception $e) {
+            Log::error('B2C API request failed: ' . $e->getMessage(), [
+                'url' => $url, // Log the URL
+                'data' => $data,
+                'session' => $session,
+            ]);
+            return ['error' => 'Request failed'];
         }
+    }
+
+    public function b2b($data, $session = null)
+    {
+
+        $sessionToken = $this->getSessionToken($session);
+
+        $token = $this->encryptKey($sessionToken);
+
+        $transData = $this->makeRequestData($data);
+
+        $response = $this->client->post(self::TRANSACT_TYPE['rt']['url'], [
+            'json' => $transData,
+            'headers' => ['Authorization' => "Bearer {$token}"]
+        ]);
+        return json_decode($response->getBody(), true);
+    }
+
+    public function reverse($data, $session = null)
+    {
+
+        $sessionToken = $this->getSessionToken($session);
+
+        $token = $this->encryptKey($sessionToken);
+
+        $transData = $this->makeRequestData($data);
+
+        $response = $this->client->post(self::TRANSACT_TYPE['rt']['url'], [
+            'json' => $transData,
+            'headers' => ['Authorization' => "Bearer {$token}"]
+        ]);
+        return json_decode($response->getBody(), true);
+    }
+
+    public function debit_create($data, $session = null)
+    {
+
+        $sessionToken = $this->getSessionToken($session);
+
+        $token = $this->encryptKey($sessionToken);
+
+        $transData = $this->makeRequestData($data);
+
+        $response = $this->client->post(self::TRANSACT_TYPE['ddc']['url'], [
+            'json' => $transData,
+            'headers' => ['Authorization' => "Bearer {$token}"]
+        ]);
+        return json_decode($response->getBody(), true);
+    }
+
+    public function debit_payment($data, $session = null)
+    {
+
+        $sessionToken = $this->getSessionToken($session);
+
+        $transData = $this->makeRequestData($data);
+
+        $response = $this->client->post(self::TRANSACT_TYPE['ddp']['url'], [
+            'json' => $transData,
+            'headers' => ['Authorization' => "Bearer {$sessionToken}"]
+        ]);
+        return json_decode($response->getBody(), true);
     }
 }

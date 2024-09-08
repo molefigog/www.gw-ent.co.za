@@ -36,39 +36,44 @@
 
 <style>
     /* Basic loader style */
-.loader2 {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.8);
-    z-index: 9999;
-}
+    .loader2 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+    }
 
-.spinner2 {
-    border: 8px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 8px solid #3498db;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-}
+    .spinner2 {
+        border: 8px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 8px solid #3498db;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
 
-.loader2 p {
-    margin-top: 10px;
-    font-size: 18px;
-    color: #333;
-}
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .loader2 p {
+        margin-top: 10px;
+        font-size: 18px;
+        color: #333;
+    }
 </style>
 <?php $__env->startSection('content'); ?>
     <div class="container mt-5">
@@ -256,33 +261,31 @@ if (isset($__slots)) unset($__slots);
             $('audio').audioPlayer();
         });
     </script>
- <script>
-
-
-    function copyToClipboard() {
-        const url = '<?php echo e($url1); ?>'; // Replace with your actual URL
-        console.log('Attempting to copy:', url); // Debugging line
-        navigator.clipboard.writeText(url).then(() => {
-            console.log('Copy successful'); // Debugging line
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'URL copied to clipboard!',
-                input: "text",
-                inputValue: url,
-                timer: 15000,
-                showConfirmButton: false
+    <script>
+        function copyToClipboard() {
+            const url = '<?php echo e($url1); ?>'; // Replace with your actual URL
+            console.log('Attempting to copy:', url); // Debugging line
+            navigator.clipboard.writeText(url).then(() => {
+                console.log('Copy successful'); // Debugging line
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'URL copied to clipboard!',
+                    input: "text",
+                    inputValue: url,
+                    timer: 15000,
+                    showConfirmButton: false
+                });
+            }).catch(err => {
+                console.error('Could not copy text:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Could not copy URL!',
+                });
             });
-        }).catch(err => {
-            console.error('Could not copy text:', err);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Could not copy URL!',
-            });
-        });
-    }
-</script>
+        }
+    </script>
 
     
     <script>
@@ -331,7 +334,6 @@ if (isset($__slots)) unset($__slots);
             }
         });
     </script>
-
 <?php $__env->stopPush(); ?>
 <?php $__env->startPush('mpesa'); ?>
     
@@ -342,65 +344,33 @@ if (isset($__slots)) unset($__slots);
 
                 let form = this;
 
-                proceedWithPayment(form);
-            });
-
-            function proceedWithPayment(form) {
-                Swal.fire({
-                    title: 'Processing',
-                    html: 'Please wait...',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    willOpen: () => {
-                        Swal.showLoading();
-                    },
-                });
-
                 $.ajax({
                     type: 'POST',
-                    url: $(form).attr('action'),
-                    data: $(form).serialize(),
+                    url: '<?php echo e(route('check-music-file')); ?>',
+                    data: {
+                        _token: '<?php echo e(csrf_token()); ?>',
+                        musicId: '<?php echo e($music->id); ?>'
+                    },
                     dataType: 'json',
                     success: function(response) {
-                        console.log('Payment response:', response); // Add logging here
-                        Swal.close();
-
                         if (response.status === 'success') {
-                            window.location.href = response.download_url;
+                            proceedWithPayment(form);
                         } else {
                             Swal.fire({
-                                icon: response.status,
-                                title: response.status.charAt(0).toUpperCase() + response.status
-                                    .slice(1),
+                                icon: 'error',
+                                title: 'Error',
                                 text: response.message,
                             });
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.log('Payment error:', xhr, status, error); // Add logging here
-                        Swal.close();
-
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Failed to make the API request',
+                            text: 'Music File Not found',
                         });
                     },
                 });
-            }
-        });
-    </script>
-
-
-
-    <script>
-        document.getElementById('showAlert').addEventListener('click', function() {
-            Swal.fire({
-                title: 'INSTRUCTIONS',
-                text: 'Send payment via M-Pesa to 59073443. You\'ll receive an OTP on your phone; use it to finalize the download payment.',
-                icon: 'info',
-                confirmButtonText: 'Dismiss'
             });
         });
     </script>
@@ -437,6 +407,21 @@ if (isset($__slots)) unset($__slots);
                     });
                 }, 500);
             });
+        });
+    </script>
+    <script>
+        document.getElementById('input_CustomerMSISDN').addEventListener('input', function() {
+            const msisdnInput = this.value;
+            const msisdnError = document.getElementById('msisdnError');
+
+            // Check if the input starts with "5" and is 8 digits long
+            if (/^5\d{7}$/.test(msisdnInput)) {
+                msisdnError.style.display = 'none';
+                this.setCustomValidity(''); // Clear custom validity message
+            } else {
+                msisdnError.style.display = 'block';
+                this.setCustomValidity('Invalid'); // Set custom validity message to block form submission
+            }
         });
     </script>
 <?php $__env->stopPush(); ?>

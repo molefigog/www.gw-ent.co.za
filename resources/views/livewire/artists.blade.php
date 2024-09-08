@@ -95,9 +95,9 @@
             transform: scale(0.8);
         }
 
-        .price {
+        /* .price {
             padding: 8px 0px;
-        }
+        } */
 
         .card-img-top {
             width: 100%;
@@ -203,11 +203,17 @@
                             </a>
 
                             <ul class="dropdown-menu">
-                                {{-- <li><a class="dropdown-item" href="#">{{$music->duration}}</a></li>
-                                <li><a class="dropdown-item" href="#">{{$music->size}}</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="far fa-clock"></i> {{ $music->duration }}</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="far fa-file-audio"></i>  {{ $music->size }}MB</a></li>
                                 <li>
-                                    <a class="dropdown-item" href="#">{{$music->likes}}/a>
-                                </li> --}}
+                                    <button style="font-size: 9px; margin-right: 4px;"
+                                        class="dropdown-item"
+                                        wire:click="incrementLikes({{ $music->id }})">
+                                        <span style="color: #007bff;">
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                            {{ $music->likes }}</span>
+                                    </button>
+                                </li>
                             </ul>
                         </div>
 
@@ -232,9 +238,7 @@
                     @endphp
                     <div class="cardfooter">
                         <div class="social-icons">
-                            <a><i class="fas fa-eye"></i> </a>
 
-                            <a><i class="fas fa-clock"></i> </a>
                             <div class="dropup-center dropup">
 
                                 <a class="" href="#" role="button" data-bs-toggle="dropdown"
@@ -266,23 +270,32 @@
     @php
         $setting = App\Models\Setting::firstOrFail();
         $appName = config('app.name');
-        $url = config('app.url');
-
+        $base_url = config('app.url');
+        $url = $base_url . '/artist/' . $artistName;
         $title = $setting ? $setting->site : $appName;
         $image = asset("storage/$setting->image");
+        $artistId = $artist['id']; // Assuming you have the artist's ID
+        $musicNames = DB::table('music_user')
+    ->where('user_id', $artistId)
+    ->join('music', 'music_user.music_id', '=', 'music.id')
+    ->pluck('music.title')
+    ->toArray();
+        $info = $artist['name'] . ' has ' . count($musicNames) . ' music tracks: ' . implode(', ', $musicNames);
+
         $keywords = 'GW ENT, genius Works ent, KS, K Fire, K-Fire, Elliotgog, GOG';
+        $image = asset('storage/'. $artist['avatar']);
     @endphp
     @section('head')
-        <title>{{ $title }}</title>
-        <meta name="description" content="{{ $setting->description }}">
-        <meta property="og:title" content="{{ $title }}">
+        <title>{{ $artist['name'] }}</title>
+        <meta name="description" content="{{$info}}">
+        <meta property="og:title" content="{{ $artist['name'] }}">
         <meta property="og:image" content="{{ $image }}">
-        <meta property="og:description" content="{{ $setting->description }}">
+        <meta property="og:description" content="{{ $info }}">
         <meta property="og:url" content="{{ $url }}" />
         <meta name="keywords" content="{{ $keywords }}">
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="{{ $title }}" />
-        <meta name="twitter:description" content="{{ $setting->description }}" />
+        <meta name="twitter:description" content="{{$info }}" />
         <meta name="twitter:image" content="{{ $image }}" />
         <meta property="fb:app_id" content="337031642040584" />
     @endsection

@@ -192,3 +192,6 @@ Route::get('songs', [SpotifyController::class, 'getSongs'])->name('songs.index')
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+Route::post('/mails', [App\Http\Controllers\InboundEmailController::class, 'handle']);

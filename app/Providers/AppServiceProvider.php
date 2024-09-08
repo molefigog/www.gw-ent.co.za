@@ -45,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
             $artists = User::orderBy('name')->get();
 
             $genres = Genre::orderBy('created_at', 'desc')->pluck('title');
+
             $view->with('setting', $setting);
             $view->with('admin', $admin);
             $view->with('artists', $artists);

@@ -28,6 +28,13 @@ class Payment extends Component
     public function pay()
     {
         try {
+
+            // $musicFilePath = public_path("{$this->musicId}");
+            // if (!Storage::exists($musicFilePath)) {
+            //     session()->flash('error', 'Music file not found.');
+            //     return redirect()->back();
+            // }
+
             $baseUrl = 'https://api.paylesotho.co.ls';
             $merchantid = config('payments.mpesa_sc');
             $merchantname = config('payments.merchant_name');
@@ -112,8 +119,8 @@ class Payment extends Component
                 'otp' => $otp,
             ]);
             $downloads->save();
-            // $message = 'Enter this ' . $otp . ' on ' . $fullurl . ' if download did not start';
-            // $this->sendSMS2($message, $this->mobileNumber);
+            $message = 'use :' . $otp . ' on ' . $fullurl . ' if download did not start';
+            $this->sendSMS2($message, $this->mobileNumber);
         } else {
             Log::error('Music track not found for ID: ' . $this->musicId);
         }

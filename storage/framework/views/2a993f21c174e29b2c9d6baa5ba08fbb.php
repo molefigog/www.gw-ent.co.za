@@ -68,12 +68,13 @@
         <?php echo $__env->make('layouts.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
         <div class="main-content">
-
+<hr>
+<br>
             <div class="page-content">
                 <div class="container-fluid text-center">
                     <?php echo $__env->yieldContent('content'); ?>
                     <?php echo $__env->make('layouts.modal', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-                    <?php echo $__env->make('songs.songs', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+                    
                 </div> <!-- container-fluid -->
             </div>
             <!-- End Page-content -->

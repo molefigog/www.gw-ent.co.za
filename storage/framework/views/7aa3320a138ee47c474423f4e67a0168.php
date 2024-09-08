@@ -16,8 +16,8 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             /* background: linear-gradient(to right,
-                    rgb(243 240 240 / 30%),
-                    rgb(74 156 167 / 14%)); */
+                rgb(243 240 240 / 30%),
+                rgb(74 156 167 / 14%)); */
         }
 
         .card {
@@ -28,8 +28,8 @@
             display: flex;
             justify-content: space-evenly;
             /* background: linear-gradient(to top,
-                    rgb(250, 250, 250),
-                    rgba(74, 156, 167, 0.418)); */
+                rgb(250, 250, 250),
+                rgba(74, 156, 167, 0.418)); */
         }
 
         .image-filter:hover {
@@ -88,11 +88,9 @@
             transform: scale(0.8);
         }
 
-        .price {
+        /* .price {
             padding: 8px 0px;
-        }
-
-
+        } */
 
         .card-img-top {
             width: 100%;
@@ -159,40 +157,52 @@
     </style>
     <div class="row g-2">
         <?php $__empty_1 = true; $__currentLoopData = $musicCollection; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $music): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+
             <div wire:key="<?php echo e($music->id); ?>" class="col-6 col-md-2">
                 <div class="card h-100">
                     <img src="<?php echo e(asset("storage/$music->image")); ?>" class="card-img-top image-filter"
                         alt="<?php echo e($music->image); ?>" />
-                    <div class="info-solid relative">
-                        <div class="play-icon track-list" data-id="<?php echo e($music->id); ?>"role="button" tabindex="0"
-                            onclick="fetchTrackData(this);">
-                            <i class="dripicons-media-play icon-size"></i>
-                        </div>
-                        <a href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
-                            <h6 class="price">R<?php echo e($music->amount ?? '-'); ?>.00</h6>
-                        </a>
-                        <div class="dropup-center dropup price">
-                            <a class="text-dark" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                <i class="fas fa-ellipsis-v"></i>
+                        <div class="info-solid relative">
+                            <div class="play-icon track-list" data-id="<?php echo e($music->id); ?>"role="button" tabindex="0"
+                                onclick="fetchTrackData(this);">
+                                <i class="dripicons-media-play icon-size"></i>
+                            </div>
+                            <a class="btn btn-outline-light waves-effect waves-light btn-sm dim" style="height:28px;"
+                                href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
+                                <strong class="price" style="padding: 0px 10px;">R<?php echo e($music->amount ?? '-'); ?>.00</strong>
                             </a>
+                            <div class="dropup-center dropup price">
+                                <a class="btn btn-outline-light waves-effect waves-light btn-sm dim my-6" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </a>
 
-                            <ul class="dropdown-menu">
-                                
-                            </ul>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#"><i class="far fa-clock"></i> <?php echo e($music->duration); ?></a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="far fa-file-audio"></i>  <?php echo e($music->size); ?>MB</a></li>
+                                    <li>
+                                        <button style="font-size: 9px; margin-right: 4px;"
+                                            class="dropdown-item"
+                                            wire:click="incrementLikes(<?php echo e($music->id); ?>)">
+                                            <span style="color: #007bff;">
+                                                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                                <?php echo e($music->likes); ?></span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+
                         </div>
-
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <a href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
-                            <h6 class="card-text">
-                                <small><?php echo e($music->artist ?? '-'); ?></small>
-                            </h6>
-                            <p class="card-text text-truncate">
-                                <small><?php echo e($music->title ?? '-'); ?></small>
-                            </p>
-                        </a>
-                    </div>
+                        <div class="card-body d-flex flex-column">
+                            <a href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
+                                <h6 class="card-text">
+                                    <small><?php echo e($music->artist ?? '-'); ?></small>
+                                </h6>
+                                <p class="card-text text-truncate">
+                                    <small><?php echo e($music->title ?? '-'); ?></small>
+                                </p>
+                            </a>
+                        </div>
                     <?php
                         $baseUrl = config('app.url');
                         $url1 = "{$baseUrl}/msingle/{$music->slug}";
@@ -203,9 +213,7 @@
                     ?>
                     <div class="cardfooter">
                         <div class="social-icons">
-                            <a><i class="fas fa-eye"></i> </a>
 
-                            <a><i class="fas fa-clock"></i> </a>
                             <div class="dropup-center dropup">
 
                                 <a class="" href="#" role="button" data-bs-toggle="dropdown"
@@ -225,6 +233,7 @@
                     </div>
                 </div>
             </div>
+
             <div id="spinner" class="spinner" style="display: none;"></div>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
 
@@ -262,7 +271,7 @@
 
     <?php $__env->startPush('player'); ?>
         <script src="<?php echo e(asset('assets/js/mediaelement-and-player.js')); ?>"></script>
-        
+
         <script>
             var trackPlaying = '',
                 audioPlayer = document.getElementById('audio-player');
@@ -606,7 +615,7 @@ if (isset($__slots)) unset($__slots);
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startPush('aplayer'); ?>
-<link rel="stylesheet" href="<?php echo e(asset('frontend/css/mediaelementplayer.css')); ?>">
+<link rel="stylesheet" href="<?php echo e(asset('assets/css/mediaelementplayer.css')); ?>">
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('audio'); ?>

@@ -41,7 +41,7 @@ class Mmino extends Component
 
     public function render()
     {
-        $allMusic = Music::latest()->paginate(16);
+        $allMusic = Music::latest()->paginate(18);
         $products = Product::latest()->paginate(10)->withQueryString();
 
 

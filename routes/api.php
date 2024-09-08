@@ -49,7 +49,7 @@ Route::get('/charge', function (Request $request) {
         'input_Currency' => 'LSL',
         'input_CustomerMSISDN' => $mssid,
         'input_ServiceProviderCode' => '000000',
-        'input_ThirdPartyConversationID' => 'GW' . rand(1000, 9999),
+        'input_ThirdPartyConversationID' => 'GW' . rand(),
         'input_TransactionReference' => 'asdodfdferre',
         'input_PurchasedItemsDesc' => $request->input('input_PurchasedItemsDesc')
     ]);
@@ -64,7 +64,43 @@ Route::get('/charge', function (Request $request) {
             'description' => $responseDesc
         ]);
 });
+Route::get('/b2c', function (Request $request) {
+    Log::info("b2c route accessed.");
+    $options = [
+        'api_key' => "FzEf1L4Ee4RkRCYVQE1cjfhKAWN2OMbl",
+        'public_key' => "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArv9yxA69XQKBo24BaF/D+fvlqmGdYjqLQ5WtNBb5tquqGvAvG3WMFETVUSow/LizQalxj2ElMVrUmzu5mGGkxK08bWEXF7a1DEvtVJs6nppIlFJc2SnrU14AOrIrB28ogm58JjAl5BOQawOXD5dfSk7MaAA82pVHoIqEu0FxA8BOKU+RGTihRU+ptw1j4bsAJYiPbSX6i71gfPvwHPYamM0bfI4CmlsUUR3KvCG24rB6FNPcRBhM3jDuv8ae2kC33w9hEq8qNB55uw51vK7hyXoAa+U7IqP1y6nBdlN25gkxEA8yrsl1678cspeXr+3ciRyqoRgj9RD/ONbJhhxFvt1cLBh+qwK2eqISfBb06eRnNeC71oBokDm3zyCnkOtMDGl7IvnMfZfEPFCfg5QgJVk1msPpRvQxmEsrX9MQRyFVzgy2CWNIb7c+jPapyrNwoUbANlN8adU1m6yOuoX7F49x+OjiG2se0EJ6nafeKUXw/+hiJZvELUYgzKUtMAZVTNZfT8jjb58j8GVtuS+6TM2AutbejaCV84ZK58E2CRJqhmjQibEUO6KPdD7oTlEkFy52Y1uOOBXgYpqMzufNPmfdqqqSM4dU70PO8ogyKGiLAIxCetMjjm6FCMEA3Kc8K0Ig7/XtFm9By6VxTJK1Mg36TlHaZKP6VzVLXMtesJECAwEAAQ==",
+        'service_provider_code' => '000000',
+        'country' => 'LES',
+        'currency' => 'LSL',
+        'persistent_session' => false,
+        'env' => 'sandbox'
+    ];
+    Log::info("Options for TzController: ", $options);
 
+    $number = $request->input('input_CustomerMSISDN');
+    $mssid = '266' . $number;
+
+    $tzController = new TzController($options);
+    $response = $tzController->b2c([
+       'input_Amount' => $request->input('input_Amount'),
+        'input_Country' => 'LES',
+        'input_Currency' => 'LSL',
+        'input_CustomerMSISDN' => $mssid,
+        'input_ServiceProviderCode' => '000000',
+        'input_ThirdPartyConversationID' => 'GW' . rand(),
+        'input_TransactionReference' => 'asdodfdferre',
+        'input_PaymentItemsDesc' => $request->input('input_PaymentItemsDesc')
+    ]);
+    Log::info("Charge response: " . print_r($response, true));
+
+    // return response()->json($response);
+        $responseCode = $response['output_ResponseCode'];
+        $responseDesc = $response['output_ResponseDesc'];
+        return response()->json([
+            'code' => $responseCode,
+            'description' => $responseDesc
+        ]);
+});
 Route::post('/patala', [CpayController::class, 'makePayment'])->name('patala');
 Route::post('/otp', [CpayController::class, 'confirmPayment'])->name('otp');
 

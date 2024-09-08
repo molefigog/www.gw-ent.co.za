@@ -61,7 +61,8 @@
         @include('layouts.header')
 
         <div class="main-content">
-
+            <hr>
+            <br>
             <div class="page-content">
                 <div class="container-fluid text-center">
                     {{ $slot }}
@@ -152,7 +153,7 @@
     <script src="{{ asset('assets/libs/node-waves/waves.min.js') }}"></script>
     <!-- Peity chart-->
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('assets/libs/peity/jquery.peity.min.js') }}"></script>
     <script>
         const BootstrapMin = "{{ asset('assets/css/bootstrap.min.css') }}";

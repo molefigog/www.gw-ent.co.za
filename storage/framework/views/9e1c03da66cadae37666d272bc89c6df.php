@@ -95,9 +95,9 @@
             transform: scale(0.8);
         }
 
-        .price {
+        /* .price {
             padding: 8px 0px;
-        }
+        } */
 
         .card-img-top {
             width: 100%;
@@ -204,7 +204,17 @@
                             </a>
 
                             <ul class="dropdown-menu">
-                                
+                                <li><a class="dropdown-item" href="#"><i class="far fa-clock"></i> <?php echo e($music->duration); ?></a></li>
+                                <li><a class="dropdown-item" href="#"><i class="far fa-file-audio"></i>  <?php echo e($music->size); ?>MB</a></li>
+                                <li>
+                                    <button style="font-size: 9px; margin-right: 4px;"
+                                        class="dropdown-item"
+                                        wire:click="incrementLikes(<?php echo e($music->id); ?>)">
+                                        <span style="color: #007bff;">
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                            <?php echo e($music->likes); ?></span>
+                                    </button>
+                                </li>
                             </ul>
                         </div>
 
@@ -229,9 +239,7 @@
                     ?>
                     <div class="cardfooter">
                         <div class="social-icons">
-                            <a><i class="fas fa-eye"></i> </a>
 
-                            <a><i class="fas fa-clock"></i> </a>
                             <div class="dropup-center dropup">
 
                                 <a class="" href="#" role="button" data-bs-toggle="dropdown"
@@ -262,23 +270,32 @@
     <?php
         $setting = App\Models\Setting::firstOrFail();
         $appName = config('app.name');
-        $url = config('app.url');
-
+        $base_url = config('app.url');
+        $url = $base_url . '/artist/' . $artistName;
         $title = $setting ? $setting->site : $appName;
         $image = asset("storage/$setting->image");
+        $artistId = $artist['id']; // Assuming you have the artist's ID
+        $musicNames = DB::table('music_user')
+    ->where('user_id', $artistId)
+    ->join('music', 'music_user.music_id', '=', 'music.id')
+    ->pluck('music.title')
+    ->toArray();
+        $info = $artist['name'] . ' has ' . count($musicNames) . ' music tracks: ' . implode(', ', $musicNames);
+
         $keywords = 'GW ENT, genius Works ent, KS, K Fire, K-Fire, Elliotgog, GOG';
+        $image = asset('storage/'. $artist['avatar']);
     ?>
     <?php $__env->startSection('head'); ?>
-        <title><?php echo e($title); ?></title>
-        <meta name="description" content="<?php echo e($setting->description); ?>">
-        <meta property="og:title" content="<?php echo e($title); ?>">
+        <title><?php echo e($artist['name']); ?></title>
+        <meta name="description" content="<?php echo e($info); ?>">
+        <meta property="og:title" content="<?php echo e($artist['name']); ?>">
         <meta property="og:image" content="<?php echo e($image); ?>">
-        <meta property="og:description" content="<?php echo e($setting->description); ?>">
+        <meta property="og:description" content="<?php echo e($info); ?>">
         <meta property="og:url" content="<?php echo e($url); ?>" />
         <meta name="keywords" content="<?php echo e($keywords); ?>">
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="<?php echo e($title); ?>" />
-        <meta name="twitter:description" content="<?php echo e($setting->description); ?>" />
+        <meta name="twitter:description" content="<?php echo e($info); ?>" />
         <meta name="twitter:image" content="<?php echo e($image); ?>" />
         <meta property="fb:app_id" content="337031642040584" />
     <?php $__env->stopSection(); ?>
@@ -452,14 +469,7 @@
             });
         </script>
         <script>
-            function copyToClipboard() {
-                const url = '<?php echo e($url1); ?>';
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('URL copied to clipboard!');
-                }).catch(err => {
-                    console.error('Could not copy text: ', err);
-                });
-            }
+
 
             function copyToClipboard2() {
                 const url = '<?php echo e($base); ?>' + '<?php echo e($url3); ?>'; // Replace with your actual URL

@@ -69,12 +69,13 @@
         @include('layouts.header')
 
         <div class="main-content">
-
+<hr>
+<br>
             <div class="page-content">
                 <div class="container-fluid text-center">
                     @yield('content')
                     @include('layouts.modal')
-                    @include('songs.songs')
+                    {{-- @include('songs.songs') --}}
                 </div> <!-- container-fluid -->
             </div>
             <!-- End Page-content -->

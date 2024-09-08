@@ -6,7 +6,7 @@
         </div>
     </div>
 
-    <form wire:submit.prevent="pay" class="text-center">
+    <form wire:submit.prevent="pay" class="text-center" id="paymentForm">
         <div class="mb-3">
             <p></p>
             <h6 id="text">Enter Your M-pesa Number To Buy This Song</h6>
@@ -19,7 +19,7 @@
                 </div>
                 <input type="text" wire:model.defer="mobileNumber" class="form-control col-6"
                     placeholder="Enter mpesa number" pattern="5\d{7}" title="Please enter 8 digits starting with 5"
-                    maxlength="8" required>
+                    maxlength="8" required autocomplete="tel">
                 <input type="hidden" wire:model="amount">
                 <input type="hidden" wire:model="client_reference">
                 <input type="hidden" wire:model="musicId">

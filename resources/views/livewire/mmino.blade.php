@@ -86,9 +86,9 @@
             transform: scale(0.8);
         }
 
-        .price {
+        /* .price {
             padding: 8px 0px;
-        }
+        } */
 
 
 
@@ -154,7 +154,18 @@
                 height: 10%;
             }
         }
+
+        .dim {
+            background: #ff2950a9;
+            color: #fcfcfc;
+            text-shadow: -1px -1px 0px var(--background),
+                3px 3px 0px var(--background),
+                6px 6px 0px #00000055;
+        }
     </style>
+    <br>
+    <hr>
+
     <div class="row g-2">
         @forelse($allMusic as $music)
             <div wire:key="{{ $music->id }}" class="col-6 col-md-2">
@@ -166,21 +177,28 @@
                             onclick="fetchTrackData(this);">
                             <i class="dripicons-media-play icon-size"></i>
                         </div>
-                        <a href="{{ route('msingle.slug', ['slug' => urlencode($music->slug)]) }}">
-                            <h6 class="price">R{{ $music->amount ?? '-' }}.00</h6>
+                        <a class="btn btn-outline-light waves-effect waves-light btn-sm dim" style="height:28px;"
+                            href="{{ route('msingle.slug', ['slug' => urlencode($music->slug)]) }}">
+                            <strong class="price" style="padding: 0px 10px;">R{{ $music->amount ?? '-' }}.00</strong>
                         </a>
                         <div class="dropup-center dropup price">
-                            <a class="text-dark" href="#" role="button" data-bs-toggle="dropdown"
+                            <a class="btn btn-outline-light waves-effect waves-light btn-sm dim my-6" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
                                 <i class="fas fa-ellipsis-v"></i>
                             </a>
 
                             <ul class="dropdown-menu">
-                                {{-- <li><a class="dropdown-item" href="#">{{$music->duration}}</a></li>
-                                <li><a class="dropdown-item" href="#">{{$music->size}}</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="far fa-clock"></i> {{ $music->duration }}</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="far fa-file-audio"></i>  {{ $music->size }}MB</a></li>
                                 <li>
-                                    <a class="dropdown-item" href="#">{{$music->likes}}/a>
-                                </li> --}}
+                                    <button style="font-size: 9px; margin-right: 4px;"
+                                        class="dropdown-item"
+                                        wire:click="incrementLikes({{ $music->id }})">
+                                        <span style="color: #007bff;">
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                            {{ $music->likes }}</span>
+                                    </button>
+                                </li>
                             </ul>
                         </div>
 
@@ -197,17 +215,15 @@
                     </div>
                     @php
                         $baseUrl = config('app.url');
-                        $url1 = "{$baseUrl}/msingle/{$music->slug}";
-                        $shareButtons = \Share::page($url1, 'Check out this music: ' . $music->title)
+                        $url = "{$baseUrl}/msingle/{$music->slug}";
+                        $shareButtons = \Share::page($url, 'Check out this music: ' . $music->title)
                             ->facebook()
                             ->twitter()
                             ->whatsapp();
                     @endphp
                     <div class="cardfooter">
                         <div class="social-icons">
-                            <a><i class="fas fa-eye"></i> </a>
 
-                            <a><i class="fas fa-clock"></i> </a>
                             <div class="dropup-center dropup">
 
                                 <a class="" href="#" role="button" data-bs-toggle="dropdown"
@@ -239,7 +255,7 @@
     @php
         $setting = App\Models\Setting::firstOrFail();
         $appName = config('app.name');
-        $url = config('app.url');
+        $home = config('app.url');
 
         $title = $setting ? $setting->site : $appName;
         $image = asset("storage/$setting->image");
@@ -251,8 +267,8 @@
         <meta property="og:title" content="{{ $title }}">
         <meta property="og:image" content="{{ $image }}">
         <meta property="og:description" content="{{ $setting->description }}">
-        <meta property="og:url" content="{{ $url }}" />
-        <link rel="canonical" href="{{ $url1 }}">
+        <meta property="og:url" content="{{ $home }}" />
+        <link rel="canonical" href="{{ $home }}">
         <meta name="keywords" content="{{ $keywords }}">
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="{{ $title }}" />
@@ -263,177 +279,8 @@
 
     @push('player')
         <script src="{{ asset('assets/js/mediaelement-and-player.js') }}"></script>
-        {{--
-        <script>
-            var trackPlaying = '',
-                audioPlayer = document.getElementById('audio-player');
 
-            audioPlayer.addEventListener("ended", function() {
-                jQuery('.track-list').find('i').removeClass('dripicons-media-pause').addClass('dripicons-media-play');
-            });
-
-            audioPlayer.addEventListener("pause", function() {
-                jQuery('.track-list').find('i').removeClass('dripicons-media-pause').addClass('dripicons-media-play');
-            });
-
-            function changeAudio(sourceUrl, posterUrl, trackTitle, trackSinger, playAudio = true) {
-                var audio = $("#audio-player"),
-                    clickEl = jQuery('[data-track="' + sourceUrl + '"]'),
-                    playerId = audio.closest('.mejs__container').attr('id'),
-                    playerObject = mejs.players[playerId];
-
-                jQuery('.track-list').find('i').removeClass('dripicons-media-pause').addClass('dripicons-media-play');
-
-                if (sourceUrl == trackPlaying) {
-                    if (playerObject.paused) {
-                        playerObject.play();
-                        clickEl.find('i').removeClass('dripicons-media-play').addClass('dripicons-media-pause');
-                    } else {
-                        playerObject.pause();
-                        clickEl.find('i').removeClass('dripicons-media-pause').addClass('dripicons-media-play');
-                    }
-                    return true;
-                }
-
-                trackPlaying = sourceUrl;
-
-                audio.attr('poster', posterUrl);
-                audio.attr('title', trackTitle);
-
-                jQuery('.mejs__layers').html('').html('<div class="mejs-track-artwork"><img src="' + posterUrl +
-                    '" alt="Track Poster" /></div><div class="mejs-track-details"><h3>' + trackTitle + '<br><span>' +
-                    trackSinger + '</span></h3></div>');
-
-                if (sourceUrl != '') {
-                    playerObject.setSrc(sourceUrl);
-                }
-                playerObject.pause();
-                playerObject.load();
-
-                if (playAudio == true) {
-                    playerObject.play();
-                    jQuery(clickEl).find('i').removeClass('dripicons-media-play').addClass('dripicons-media-pause');
-                }
-            }
-
-            function fetchTrackData(el) {
-                var id = jQuery(el).attr('data-id');
-                document.getElementById('spinner').style.display = 'block';
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    url: '/api/get_data',
-                    method: 'POST',
-                    data: {
-                        id: id
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        document.getElementById('spinner').style.display = 'none';
-                        if (response.error) {
-                            console.error('Error fetching track data:', response.error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Error fetching track data: ' + response.error,
-                            });
-                        } else {
-                            changeAudio(response.demo, response.image, response.title, response.artist);
-                        }
-                    },
-                    error: function(xhr) {
-                        document.getElementById('spinner').style.display = 'none';
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Failed to fetch track data. Please try again later.',
-                            footer: 'Status Code: ' + xhr.status
-                        });
-                        console.error('Failed to fetch track data:', xhr);
-                    }
-                });
-            }
-
-            function fetchTrackData2(el) {
-                var id = jQuery(el).attr('data-id');
-
-                // Show spinner
-                document.getElementById('spinner').style.display = 'block';
-
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    url: '/api/get_data',
-                    method: 'POST',
-                    data: {
-                        id: id
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        // Hide spinner
-                        document.getElementById('spinner').style.display = 'none';
-
-                        if (response.error) {
-                            console.error('Error fetching track data:', response.error);
-                        } else {
-                            changeAudio(response.demo, response.image, response.title, response.artist);
-                        }
-                    },
-                    error: function(xhr) {
-                        // Hide spinner
-                        document.getElementById('spinner').style.display = 'none';
-
-                        console.error('Failed to fetch track data:', xhr);
-                    }
-                });
-            }
-            jQuery(window).on('load', function() {
-                var trackOnload = jQuery('#track-onload');
-
-                if (trackOnload.length > 0) {
-                    var audioTrack = trackOnload.attr('data-track'),
-                        posterUrl = trackOnload.attr('data-poster'),
-                        trackTitle = trackOnload.attr('data-title');
-                    trackSinger = trackOnload.attr('data-singer');
-
-                    setTimeout(function() {
-                        changeAudio(audioTrack, posterUrl, trackTitle, trackSinger, false);
-                    }, 500);
-                }
-            });
-
-            document.addEventListener('DOMContentLoaded', function() {
-                const audioPlayer = document.getElementById('audio-player');
-                const divToHide = document.querySelector('.toggle--player');
-
-                if (!audioPlayer || !divToHide) {
-                    console.error('Audio player or div to hide not found.');
-                    return;
-                }
-
-                function hideDivIfNoAudio() {
-                    if (!audioPlayer.paused || audioPlayer.currentTime > 0) {
-                        divToHide.style.display = 'block';
-                    } else {
-                        divToHide.style.display = 'none';
-                    }
-                }
-
-                function handleAudioEvents() {
-                    hideDivIfNoAudio();
-                }
-
-                audioPlayer.addEventListener('loadeddata', handleAudioEvents);
-                audioPlayer.addEventListener('play', handleAudioEvents);
-                audioPlayer.addEventListener('pause', handleAudioEvents);
-                audioPlayer.addEventListener('ended', handleAudioEvents);
-                audioPlayer.addEventListener('timeupdate', handleAudioEvents);
-                hideDivIfNoAudio();
-            });
-        </script> --}}
-        <script>
+        {{-- <script>
             var trackPlaying = '',
                 audioPlayer = document.getElementById('audio-player');
 
@@ -574,14 +421,179 @@
                 audioPlayer.addEventListener('timeupdate', handleAudioEvents);
                 hideDivIfNoAudio();
             });
+        </script> --}}
+        <script>
+            var trackPlaying = '',
+                audioPlayer = document.getElementById('audio-player');
+
+            audioPlayer.addEventListener("ended", function() {
+                console.log("Audio ended.");
+                jQuery('.track-list').find('i').removeClass('dripicons-media-pause').addClass('dripicons-media-play');
+            });
+
+            audioPlayer.addEventListener("pause", function() {
+                console.log("Audio paused.");
+                jQuery('.track-list').find('i').removeClass('dripicons-media-pause').addClass('dripicons-media-play');
+            });
+
+            function changeAudio(sourceUrl, posterUrl, trackTitle, trackSinger, playAudio = true) {
+                console.log("Changing audio to:", sourceUrl);
+                var audio = $("#audio-player"),
+                    clickEl = jQuery('[data-track="' + sourceUrl + '"]'),
+                    playerId = audio.closest('.mejs__container').attr('id'),
+                    playerObject = mejs.players[playerId];
+
+                console.log("Clicked Element:", clickEl);
+                console.log("Player Object:", playerObject);
+
+                if (!playerObject) {
+                    console.error('Player object not found for playerId:', playerId);
+                    return;
+                }
+
+                jQuery('.track-list').find('i').removeClass('dripicons-media-pause').addClass('dripicons-media-play');
+
+                if (sourceUrl == trackPlaying) {
+                    if (playerObject.paused) {
+                        playerObject.play();
+                        clickEl.find('i').removeClass('dripicons-media-play').addClass('dripicons-media-pause');
+                        console.log("Playing track.");
+                    } else {
+                        playerObject.pause();
+                        clickEl.find('i').removeClass('dripicons-media-pause').addClass('dripicons-media-play');
+                        console.log("Pausing track.");
+                    }
+                    return true;
+                }
+
+                trackPlaying = sourceUrl;
+
+                audio.attr('poster', posterUrl);
+                audio.attr('title', trackTitle);
+
+                jQuery('.mejs__layers').html('').html('<div class="mejs-track-artwork"><img src="' + posterUrl +
+                    '" alt="Track Poster" /></div><div class="mejs-track-details"><h3>' + trackTitle + '<br><span>' +
+                    trackSinger + '</span></h3></div>');
+
+                if (sourceUrl != '') {
+                    playerObject.setSrc(sourceUrl);
+                }
+                playerObject.pause();
+                playerObject.load();
+
+                if (playAudio == true) {
+                    playerObject.play();
+                    jQuery(clickEl).find('i').removeClass('dripicons-media-play').addClass('dripicons-media-pause');
+                    console.log("Playing new track.");
+                }
+            }
+
+            function fetchTrackData(el) {
+                var id = jQuery(el).attr('data-id');
+                document.getElementById('spinner').style.display = 'block';
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: '/api/get_data',
+                    method: 'POST',
+                    data: {
+                        id: id
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        document.getElementById('spinner').style.display = 'none';
+                        if (response.error) {
+                            console.error('Error fetching track data:', response.error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error fetching track data: ' + response.error,
+                            });
+                        } else {
+                            changeAudio(response.demo, response.image, response.title, response.artist);
+                        }
+                    },
+                    error: function(xhr) {
+                        document.getElementById('spinner').style.display = 'none';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to fetch track data. Please try again later.',
+                            footer: 'Status Code: ' + xhr.status
+                        });
+                        console.error('Failed to fetch track data:', xhr);
+                    }
+                });
+            }
+
+            jQuery(window).on('load', function() {
+                var trackOnload = jQuery('#track-onload');
+
+                if (trackOnload.length > 0) {
+                    var audioTrack = trackOnload.attr('data-track'),
+                        posterUrl = trackOnload.attr('data-poster'),
+                        trackTitle = trackOnload.attr('data-title'),
+                        trackSinger = trackOnload.attr('data-singer');
+
+                    setTimeout(function() {
+                        changeAudio(audioTrack, posterUrl, trackTitle, trackSinger, false);
+                    }, 500);
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const audioPlayer = document.getElementById('audio-player');
+                const divToHide = document.querySelector('.toggle--player');
+
+                if (!audioPlayer || !divToHide) {
+                    console.error('Audio player or div to hide not found.');
+                    return;
+                }
+
+                function hideDivIfNoAudio() {
+                    if (!audioPlayer.paused || audioPlayer.currentTime > 0) {
+                        divToHide.style.display = 'block';
+                    } else {
+                        divToHide.style.display = 'none';
+                    }
+                }
+
+                function handleAudioEvents() {
+                    hideDivIfNoAudio();
+                }
+
+                audioPlayer.addEventListener('loadeddata', handleAudioEvents);
+                audioPlayer.addEventListener('play', handleAudioEvents);
+                audioPlayer.addEventListener('pause', handleAudioEvents);
+                audioPlayer.addEventListener('ended', handleAudioEvents);
+                audioPlayer.addEventListener('timeupdate', handleAudioEvents);
+                hideDivIfNoAudio();
+            });
         </script>
+
         <script>
             function copyToClipboard() {
-                const url = '{{ $url1 }}';
+                const url = '{{ $url }}'; // Replace with your actual URL
+                console.log('Attempting to copy:', url); // Debugging line
                 navigator.clipboard.writeText(url).then(() => {
-                    alert('URL copied to clipboard!');
+                    console.log('Copy successful'); // Debugging line
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'URL copied to clipboard!',
+                        input: "text",
+                        inputValue: url,
+                        timer: 15000,
+                        showConfirmButton: false
+                    });
                 }).catch(err => {
-                    console.error('Could not copy text: ', err);
+                    console.error('Could not copy text:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Could not copy URL!',
+                    });
                 });
             }
         </script>
@@ -601,6 +613,6 @@
     @endsection
 
     @section('search')
-    @livewire('search-bar')
+        @livewire('search-bar')
     @endsection
 </div>
