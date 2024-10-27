@@ -65,7 +65,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
             'balance',
             'mobile_number',
             'avatar',
-            'facebook_id'
+            'facebook_id',
+            'otp_code',
+            'otp_date',
         ];
 
 
@@ -157,7 +159,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
                 "mobile_number",
                 "balance",
                 "role",
-                "avatar"
+                "avatar",
+                "otp_code",
+                "otp_date"
             ];
         }
 
@@ -175,7 +179,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
                 "mobile_number",
                 "balance",
                 "role",
-                "avatar"
+                "avatar",
+                "otp_code",
+                "otp_date"
             ];
         }
 
@@ -191,7 +197,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
                 "email",
                 "mobile_number",
                 "balance",
-                "id"
+                "id",
+                "otp_code",
+                "otp_date"
             ];
         }
 
@@ -207,7 +215,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
                 "email",
                 "mobile_number",
                 "balance",
-                "id"
+                "id",
+                "otp_code",
+                "otp_date"
             ];
         }
 
@@ -223,7 +233,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
                 "email",
                 "mobile_number",
                 "avatar",
-                "id"
+                "id",
+                "otp_code",
+                "otp_date"
             ];
         }
 
@@ -239,7 +251,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
                 "name",
                 "email",
                 "mobile_number",
-                "balance"
+                "balance",
+                "otp_code",
+                "otp_date"
             ];
         }
 
@@ -255,7 +269,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
                 "name",
                 "email",
                 "mobile_number",
-                "balance"
+                "balance",
+                "otp_code",
+                "otp_date"
             ];
         }
 
@@ -271,7 +287,9 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
                 "email",
                 "mobile_number",
                 "avatar",
-                "id"
+                "id",
+                "otp_code",
+                "otp_date"
             ];
         }
 
@@ -285,7 +303,6 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         const CREATED_AT = 'created_at';
         const UPDATED_AT = 'updated_at';
 
-
         /**
          * Get current user name
          * @return string
@@ -296,5 +313,55 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 
         public function UserBalance(){
             return $this->balance;
+        }
+
+        /**
+         * Get current user id
+         * @return string
+         */
+        public function UserId(){
+            return $this->id;
+        }
+        public function UserEmail(){
+            return $this->email;
+        }
+        public function UserPhoto(){
+            return $this->avatar;
+        }
+
+        /**
+         * Send Password reset link to user email
+         * @param string $token
+         * @return string
+         */
+        public function sendPasswordResetNotification($token)
+        {
+            // Your your own implementation.
+            $this->notify(new \App\Notifications\ResetPassword($token));
+        }
+
+        /**
+         * Send user account verification link to user email
+         * @return string
+         */
+        public function sendEmailVerificationNotification()
+        {
+            $this->notify(new \App\Notifications\VerifyEmail); // my notification
+        }
+
+        public function saveOtpCode($code)
+        {
+            $this->otp_code = $code;
+            // $duration = config("auth.otp_duration");
+            $duration = intval(config("auth.otp_duration"));
+            $this->otp_date = now()->addMinutes($duration);
+            $this->save();
+        }
+
+        public function resetOtpCode()
+        {
+            $this->otp_code = null;
+            $this->otp_date = null;
+            $this->save();
         }
 }

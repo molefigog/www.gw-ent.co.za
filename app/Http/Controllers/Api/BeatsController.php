@@ -126,7 +126,7 @@ class BeatsController extends Controller
         $filenameWithoutExtension = pathinfo($record->file, PATHINFO_FILENAME);
         $demoFilename = str_replace(' ', '-', $filenameWithoutExtension) . '-demo.mp3';
         MpegAudio::fromFile($filePath)
-            ->trim(10, 30)
+            ->trim(10, 40)
             ->saveFile(public_path('storage/demos/' . $demoFilename));
         try {
             $record->update([
@@ -186,4 +186,18 @@ class BeatsController extends Controller
 		}
 		return $this->respond($arr_id);
 	}
+    public function getBeatData(Request $request)
+    {
+        $music = Beat::find($request->id);
+        if ($music) {
+            return response()->json([
+                'demo' => asset('storage/demos/' . $music->demo),
+                'image' => asset('storage/' . $music->image),
+                'title' => $music->title ?? '-',
+                'artist' => $music->artist ?? '-',
+            ]);
+        }
+
+        return response()->json(['error' => 'Music not found'], 404);
+    }
 }

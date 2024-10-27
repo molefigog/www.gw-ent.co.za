@@ -12,9 +12,18 @@ use App\Http\Requests\MusicEditRequest;
 use App\Models\Music;
 use Illuminate\Http\Request;
 use Exception;
-
+use App\Http\Resources\MusicCollection;
 class MusicController extends Controller
 {
+
+    public function musicIndex(Request $request): MusicCollection
+    {
+        $tracks = Music::latest()
+
+        ->paginate();
+        return new MusicCollection($tracks);
+    }
+
     function index(Request $request, $fieldname = null, $fieldvalue = null)
     {
         // Get the authenticated user
@@ -61,27 +70,56 @@ class MusicController extends Controller
      * Save form record to the table
      * @return \Illuminate\Http\Response
      */
+    // function add(MusicAddRequest $request)
+    // {
+    //     $modeldata = $request->validated();
+
+    //     if (array_key_exists("image", $modeldata)) {
+    //         // Move uploaded file from temp directory to destination directory
+    //         $fileInfo = $this->moveUploadedFiles($modeldata['image'], "image");
+    //         $modeldata['image'] = $fileInfo['filepath'];
+    //     }
+
+    //     if (array_key_exists("file", $modeldata)) {
+    //         // Move uploaded file from temp directory to destination directory
+    //         $fileInfo = $this->moveUploadedFiles($modeldata['file'], "file");
+    //         $modeldata['file'] = $fileInfo['filepath'];
+    //     }
+    //     // Save Music record
+    //     $user = auth()->user();
+    //     $record = $user->musics()->create($modeldata);
+    //     $this->afterAdd($record);
+    //     return $this->respond($record);
+    // }
     function add(MusicAddRequest $request)
-    {
-        $modeldata = $request->validated();
+{
+    // Log the validated input data
+    Log::info('MusicAddRequest Data:', $request->all());
 
-        if (array_key_exists("image", $modeldata)) {
-            // Move uploaded file from temp directory to destination directory
-            $fileInfo = $this->moveUploadedFiles($modeldata['image'], "image");
-            $modeldata['image'] = $fileInfo['filepath'];
-        }
+    $modeldata = $request->validated();
 
-        if (array_key_exists("file", $modeldata)) {
-            // Move uploaded file from temp directory to destination directory
-            $fileInfo = $this->moveUploadedFiles($modeldata['file'], "file");
-            $modeldata['file'] = $fileInfo['filepath'];
-        }
-        // Save Music record
-        $user = auth()->user();
-        $record = $user->musics()->create($modeldata);
-        $this->afterAdd($record);
-        return $this->respond($record);
+    if (array_key_exists("image", $modeldata)) {
+        // Move uploaded file from temp directory to destination directory
+        $fileInfo = $this->moveUploadedFiles($modeldata['image'], "image");
+        $modeldata['image'] = $fileInfo['filepath'];
     }
+
+    if (array_key_exists("file", $modeldata)) {
+        // Move uploaded file from temp directory to destination directory
+        $fileInfo = $this->moveUploadedFiles($modeldata['file'], "file");
+        $modeldata['file'] = $fileInfo['filepath'];
+    }
+
+    // Save Music record
+    $user = auth()->user();
+    $record = $user->musics()->create($modeldata);
+
+    // Log the created record data
+    Log::info('Created Music Record:', $record->toArray());
+
+    $this->afterAdd($record);
+    return $this->respond($record);
+}
     /**
      * After new record created
      * @param array $record // newly created record
@@ -97,7 +135,7 @@ class MusicController extends Controller
         $filenameWithoutExtension = pathinfo($record->file, PATHINFO_FILENAME);
         $demoFilename = str_replace(' ', '-', $filenameWithoutExtension) . '-demo.mp3';
         MpegAudio::fromFile($filePath)
-            ->trim(10, 30)
+            ->trim(10, 50)
             ->saveFile(public_path('storage/demos/' . $demoFilename));
 
         // Extract filename without path

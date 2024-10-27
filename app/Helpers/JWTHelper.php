@@ -3,6 +3,7 @@
 namespace App\Helpers;
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 class JWTHelper
 {
 	// encoding data
@@ -32,15 +33,15 @@ class JWTHelper
 	}
 
 	// decode the token
-	public static function decode($jwt) {
-		try{
-			$secret = config('auth.jwt_secret');
-			$algorithm = config('auth.jwt_algorithm');
-			$decoded = JWT::decode($jwt, $secret, [$algorithm]);
-			return $decoded->data;
-		}
-		catch(Exception $e){
-			throw new Exception($e->getMessage());
-		}
-	}
+    public static function decode($jwt) {
+        try {
+            $secret = config('auth.jwt_secret');
+            $algorithm = config('auth.jwt_algorithm');
+            // Pass the key along with the algorithm
+            $decoded = JWT::decode($jwt, new Key($secret, $algorithm));
+            return $decoded->data;
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
 }

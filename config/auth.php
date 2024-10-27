@@ -114,4 +114,37 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'otp_duration' => env('OTP_DURATION', 5),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Jwt secret key
+    |--------------------------------------------------------------------------
+    |
+    | Secret key used to generate JWt token
+    |
+    */
+    'jwt_secret' => env('JWT_SECRET', ''),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Jwt algorithm
+    |--------------------------------------------------------------------------
+    |
+    | Algorithm used to sign the token
+    |
+    */
+    'jwt_algorithm' => env('JWT_ALGORITHM', 'HS256'),
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | JWT validaty duration in minutes
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the amount of minutes before a jwt token times out
+    |
+    */
+
+    'jwt_duration' => env('JWT_DURATION', 30),
 ];

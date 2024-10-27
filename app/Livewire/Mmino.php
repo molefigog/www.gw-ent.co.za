@@ -3,18 +3,9 @@
 namespace App\Livewire;
 
 use Illuminate\Http\Request;
-use Spatie\Sitemap\Sitemap;
-use Spatie\Sitemap\Tags\Url;
-use App\Models\Beat;
 use App\Models\Music;
 use App\Models\Product;
-use App\Models\Setting;
-use App\Models\Genre;
-use App\Models\User;
 use Livewire\Attributes\Title;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -26,11 +17,12 @@ class Mmino extends Component
 
     public $search = "";
 
+    public $tab = 'music'; // Default tab
     public $music;
-    public $products;
     public $downloads;
     public $genres;
-
+    public $page;
+    public $url;
 
     public function incrementLikes(Request $request, $musicId)
     {
@@ -38,19 +30,33 @@ class Mmino extends Component
         $this->music->increment('likes');
         $this->music->save();
     }
+    public function switchTab($tab)
+    {
+        $this->tab = $tab;
+        $this->resetPage(); // Reset pagination when switching tabs
+    }
+
 
     public function render()
     {
-        $allMusic = Music::latest()->paginate(18);
-        $products = Product::latest()->paginate(10)->withQueryString();
+        // Fetch all music excluding beats
+        $allMusic = Music::where('publish', true)
+            ->where('beat', false)
+            ->latest()
+            ->paginate(18);
+
+        // Fetch beats only
+        $beats = Music::where('publish', true)
+            ->where('beat', true)
+            ->where('sold', false)
+            ->latest()
+            ->paginate(18);
 
 
-
-            return view('livewire.mmino', [
-                'allMusic' => $allMusic,
-                'products' => $products,
-
-
-            ]);
+        return view('livewire.mmino', [
+            'allMusic' => $allMusic,
+            'beats' => $beats,
+            'page' => $this->page, // Pass the active tab to the view
+        ]);
     }
 }

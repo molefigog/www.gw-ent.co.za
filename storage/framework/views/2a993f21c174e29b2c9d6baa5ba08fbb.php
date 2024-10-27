@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
 
@@ -61,7 +61,7 @@
 
 
 
-<body data-topbar="dark" data-bs-theme="dark"data-layout="horizontal">
+<body data-topbar="dark"data-layout="horizontal">
     <!-- Begin page -->
     <div id="layout-wrapper">
 
@@ -124,49 +124,7 @@
     <!-- END layout-wrapper -->
 
     <!-- Right Sidebar -->
-    <div class="right-bar">
-        <div data-simplebar class="h-100">
-            <div class="rightbar-title px-3 py-4">
-                <a href="javascript:void(0);" class="right-bar-toggle float-end">
-                    <i class="mdi mdi-close noti-icon"></i>
-                </a>
-                <h5 class="m-0">Settings</h5>
-            </div>
-            <!-- Settings -->
-            <hr class="mt-0" />
-
-            <div class="p-4">
-
-                <div class="form-check form-switch mb-3">
-                    <input type="checkbox" class="form-check-input theme-choice" id="light-mode-switch" checked />
-                    <label class="form-check-label" for="light-mode-switch">Light Mode</label>
-                </div>
-                <div class="form-check form-switch mb-3">
-                    <input type="checkbox" class="form-check-input theme-choice" id="dark-mode-switch"
-                        data-bsStyle="<?php echo e(asset('assets/css/bootstrap-dark.min.css')); ?>"
-                        data-appStyle="<?php echo e(asset('assets/css/app-dark.min.css')); ?>" />
-                    <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
-                </div>
-                <?php
-$__split = function ($name, $params = []) {
-    return [$name, $params];
-};
-[$__name, $__params] = $__split('search-bar');
-
-$__html = app('livewire')->mount($__name, $__params, 'lw-3489489113-0', $__slots ?? [], get_defined_vars());
-
-echo $__html;
-
-unset($__html);
-unset($__name);
-unset($__params);
-unset($__split);
-if (isset($__slots)) unset($__slots);
-?>
-            </div>
-
-        </div> <!-- end slimscroll-menu-->
-    </div>
+    
 
 
 
@@ -186,7 +144,7 @@ if (isset($__slots)) unset($__slots);
         const BootstrapRtl = "<?php echo e(asset('assets/css/bootstrap-rtl.min.css')); ?>";
         const AppRtl = "<?php echo e(asset('assets/css/app-rtl.min.css')); ?>";
     </script>
-    <script src="<?php echo e(asset('assets/js/app.js')); ?>"></script>
+    
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scripts(); ?>
 
     <?php echo $__env->yieldPushContent('player'); ?>

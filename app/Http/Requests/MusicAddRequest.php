@@ -22,9 +22,9 @@ class MusicAddRequest extends FormRequest
      */
     public function rules()
     {
-		
+
         return [
-            
+
 				"genre_id" => "required",
 				"artist" => "required|string",
 				"title" => "required|string",
@@ -32,6 +32,9 @@ class MusicAddRequest extends FormRequest
 				"image" => "nullable",
 				"file" => "required",
 				"description" => "required",
+                'free' => 'boolean',
+                'beat' => 'boolean',
+                'publish' => 'boolean',
         ];
     }
 

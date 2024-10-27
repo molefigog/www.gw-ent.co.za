@@ -89,7 +89,7 @@ class CreateBeat extends CreateRecord
     $filenameWithoutExtension = pathinfo($this->record->file, PATHINFO_FILENAME);
 
     $demoFilename = str_replace(' ', '-', $filenameWithoutExtension) . '-demo.mp3';
-    MpegAudio::fromFile($file)->trim(10, 30)->saveFile(public_path('storage/demos/' . $demoFilename));
+    MpegAudio::fromFile($file)->trim(10, 40)->saveFile(public_path('storage/demos/' . $demoFilename));
     $demoName = $demoFilename;
 
     $music = Beat::findOrFail($this->record->id);
@@ -105,7 +105,7 @@ class CreateBeat extends CreateRecord
     Notification::make()
         ->success()
         ->title('Beat Uploaded!')
-        ->body('30 seconds snippet is generated Successfully!!')
+        ->body('40 seconds snippet is generated Successfully!!')
         ->duration(9000)
         ->send();
 }

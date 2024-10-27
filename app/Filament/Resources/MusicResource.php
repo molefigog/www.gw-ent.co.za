@@ -19,7 +19,7 @@ use Filament\Forms\Components\Section;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Wizard;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Step;
 use Illuminate\Support\HtmlString;
 use Filament\Tables;
@@ -28,6 +28,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Log;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Tables\Columns\CheckboxColumn;
 
 class MusicResource extends Resource
 {
@@ -66,7 +68,21 @@ class MusicResource extends Resource
                         FileUpload::make('file')->preserveFilenames()->required()
                             ->acceptedFileTypes(['audio/mpeg', 'audio/mp3'])->maxSize(10024),
 
+                        ToggleButtons::make('beat')
+                            ->label('is it a Beat?')
 
+                            ->boolean()
+                            ->grouped(),
+                        ToggleButtons::make('free')
+                            ->label('is it free?')
+
+                            ->boolean()
+                            ->grouped(),
+                        ToggleButtons::make('publish')
+                            ->label('Publish this song?')
+
+                            ->boolean()
+                            ->grouped(),
                     ])->Columns(2),
 
             ]);
@@ -101,13 +117,24 @@ class MusicResource extends Resource
         return $table
             ->query($query)
             ->columns([
+
                 ImageColumn::make('image')->size(30),
-                TextColumn::make('title') ->searchable(),
-                TextColumn::make('artist') ->searchable(),
+                TextColumn::make('title')->searchable(),
+                TextColumn::make('artist')->searchable(),
                 TextColumn::make('genre.title'),
+                CheckboxColumn::make('publish'),
             ])
             ->filters([
-                //
+                Filter::make('title')
+                    ->label('Newest First')
+                    ->query(function ($query) {
+                        return $query->where('title')->orderBy('created_at', 'desc');
+                    }),
+                Filter::make('title1')
+                    ->label('Oldest First')
+                    ->query(function ($query) {
+                        return $query->where('title')->orderBy('created_at', 'asc');
+                    })
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

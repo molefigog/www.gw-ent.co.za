@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
 
@@ -62,7 +62,7 @@
     $artists = App\Models\User::orderBy('name')->get();
 @endphp --}}
 
-<body data-topbar="dark" data-bs-theme="dark"data-layout="horizontal">
+<body data-topbar="dark"data-layout="horizontal">
     <!-- Begin page -->
     <div id="layout-wrapper">
 
@@ -124,7 +124,7 @@
     <!-- END layout-wrapper -->
 
     <!-- Right Sidebar -->
-    <div class="right-bar">
+    {{-- <div class="right-bar">
         <div data-simplebar class="h-100">
             <div class="rightbar-title px-3 py-4">
                 <a href="javascript:void(0);" class="right-bar-toggle float-end">
@@ -151,7 +151,7 @@
             </div>
 
         </div> <!-- end slimscroll-menu-->
-    </div>
+    </div> --}}
 
 
 
@@ -171,7 +171,7 @@
         const BootstrapRtl = "{{ asset('assets/css/bootstrap-rtl.min.css') }}";
         const AppRtl = "{{ asset('assets/css/app-rtl.min.css') }}";
     </script>
-    <script src="{{ asset('assets/js/app.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/app.js') }}"></script> --}}
     @livewireScripts
     @stack('player')
 

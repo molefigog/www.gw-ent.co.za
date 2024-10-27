@@ -148,27 +148,23 @@ class BeatController extends Controller
     }
 
     // slug
-
     public function showBySlug($slug)
     {
         // $title = urldecode($title); // Decode URL-encoded title
-        $beat = Beat::where('slug', $slug)->firstOrFail();
-
+        $music = Beat::where('slug', $slug)->firstOrFail();
+        // $music->increment('views');
         // Get the base URL dynamically
-        $artist = $beat->artist;
-        $title = $beat->title;
-        $image = url($beat->image ? Storage::url($beat->image) : '');
-        $description = $beat->description;
-        $baseUrl = 'https://www.gw-ent.co.za';
-        $url = "{$baseUrl}/beat/{$beat->slug}";
-
-        // Generate social share buttons
-        $shareButtons = \Share::page($url, 'Check out this beat: ' . $beat->title)
+        $artist = $music->artist;
+        $title = $music->title;
+        $image = url($music->image ? Storage::url($music->image) : '');
+        $description = $music->description;
+        $baseUrl = config('app.url');
+        $url1 = "{$baseUrl}/beat/{$music->slug}";
+        $shareButtons = \Share::page($url1, 'Check out this music: ' . $music->title)
             ->facebook()
             ->twitter()
             ->whatsapp();
 
-        // Store the intended URL in the session
         $intendedUrl = route('beat.slug', ['slug' => $slug]);
         Session::put('intended_url', $intendedUrl);
 
@@ -178,18 +174,57 @@ class BeatController extends Controller
         $Paypal = config('paypal.paypal_url');
         $PAYPAL_ID = config('paypal.paypal_id');
         $currency = config('paypal.paypal_currency');
-
+        // $metaTags = $this->generateMetaTags($music);
         $metaTags = [
             'title' => $title,
             'image' => $image,
             'description' => $description,
-            'keywords' => $artist . ', ' . $title, // Separate keywords with a comma
-            'url' => $url,
+            'keywords' => $artist . ', ' . $title,
+            'url' => $url1,
         ];
-
-
-        return view('beat', compact('beat', 'metaTags',  'shareButtons', 'userId', 'Paypal', 'PAYPAL_ID', 'currency'));
+        return view('beat', compact('music', 'metaTags',  'shareButtons', 'userId', 'Paypal', 'PAYPAL_ID', 'currency', 'url1'));
     }
+    // public function showBySlug($slug)
+    // {
+    //     // $title = urldecode($title); // Decode URL-encoded title
+    //     $beat = Beat::where('slug', $slug)->firstOrFail();
+
+    //     // Get the base URL dynamically
+    //     $artist = $beat->artist;
+    //     $title = $beat->title;
+    //     $image = url($beat->image ? Storage::url($beat->image) : '');
+    //     $description = $beat->description;
+    //     $baseUrl = 'https://www.gw-ent.co.za';
+    //     $url = "{$baseUrl}/beat/{$beat->slug}";
+
+    //     // Generate social share buttons
+    //     $shareButtons = \Share::page($url, 'Check out this beat: ' . $beat->title)
+    //         ->facebook()
+    //         ->twitter()
+    //         ->whatsapp();
+
+    //     // Store the intended URL in the session
+    //     $intendedUrl = route('beat.slug', ['slug' => $slug]);
+    //     Session::put('intended_url', $intendedUrl);
+
+    //     $userId = Auth::check() ? Auth::user()->id : null;
+
+    //     // "https://www.paypal.com/cgi-bin/webscr" live url
+    //     $Paypal = config('paypal.paypal_url');
+    //     $PAYPAL_ID = config('paypal.paypal_id');
+    //     $currency = config('paypal.paypal_currency');
+
+    //     $metaTags = [
+    //         'title' => $title,
+    //         'image' => $image,
+    //         'description' => $description,
+    //         'keywords' => $artist . ', ' . $title, // Separate keywords with a comma
+    //         'url' => $url,
+    //     ];
+
+
+    //     return view('beat', compact('beat', 'metaTags',  'shareButtons', 'userId', 'Paypal', 'PAYPAL_ID', 'currency'));
+    // }
     /**
      * Show the form for editing the specified resource.
      */

@@ -57,7 +57,7 @@ class BeatResource extends Resource
                             ->options(Genre::all()->pluck('title', 'id'))
                             ->searchable(),
                         MarkdownEditor::make('description')->columnSpanFull(),
-                        FileUpload::make('image')->preserveFilenames()->maxSize(512)->disk('public')->directory('images'),
+                        FileUpload::make('image')->maxSize(512)->disk('public')->directory('images'),
                         FileUpload::make('file')->preserveFilenames()
                             ->acceptedFileTypes(['audio/mpeg', 'audio/mp3'])->maxSize(13024),
 

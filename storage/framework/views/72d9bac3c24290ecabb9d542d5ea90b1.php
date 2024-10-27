@@ -76,10 +76,11 @@
     }
 </style>
 <?php $__env->startSection('content'); ?>
+<?php if($music->publish): ?>
     <div class="container mt-5">
         <div class="row">
             <div class="card-img-wrapper col-md-6 ">
-                <img src="<?php echo e(asset("storage/$music->image")); ?>" class="img-fluid" alt="Product Image">
+                <img src="<?php echo e($music->img); ?>" class="img-fluid" alt="Product Image">
             </div>
             <div class="col-md-6">
                 <h2><?php echo e($music->title ?? '-'); ?></h2>
@@ -95,7 +96,7 @@
                 <hr>
                 <p class="text-center">Payment Gateways</p>
                 <hr>
-                <?php if($music->amount == 0): ?>
+                <?php if($music->free): ?>
                     <div id="wrap">
                         <form action="<?php echo e(route('mp3.download', ['mp3' => $music->id])); ?>" method="get">
                             <?php echo csrf_field(); ?>
@@ -107,6 +108,14 @@
                             </button>
                         </form>
                     </div>
+                <?php else: ?>
+                <?php if($music->sold): ?>
+
+                <button type="submit" class="btn btn-outline-success btn-sm">
+
+                    <span class="title2 gee">Sold</span>
+
+                </button>
                 <?php else: ?>
                     <nav class="text-center">
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -181,6 +190,7 @@ if (isset($__slots)) unset($__slots);
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
                 <?php endif; ?>
                 
                 <hr>
@@ -213,7 +223,7 @@ if (isset($__slots)) unset($__slots);
         </div>
 
     </div>
-
+<?php endif; ?>
 
     <?php
 $__split = function ($name, $params = []) {

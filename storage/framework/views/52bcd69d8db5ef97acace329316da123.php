@@ -1,13 +1,10 @@
 <div>
-    <div class="app-search d-none d-lg-block">
+    <div class="app-search">
         <div class="position-relative">
             <input wire:model.live="search" type="text" class="form-control" placeholder="Search...">
             <span class="fa fa-search"></span>
         </div>
     </div>
-
-
-
 
     <!--[if BLOCK]><![endif]--><?php if(sizeof($songs) > 0): ?>
 

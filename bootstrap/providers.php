@@ -8,5 +8,6 @@ return [
     RealRashid\SweetAlert\SweetAlertServiceProvider::class,
     Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
     Barryvdh\Snappy\ServiceProvider::class,
+    Intervention\Image\ImageServiceProvider::class,
 
 ];

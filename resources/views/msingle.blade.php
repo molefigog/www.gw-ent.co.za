@@ -76,10 +76,11 @@
     }
 </style>
 @section('content')
+@if ($music->publish)
     <div class="container mt-5">
         <div class="row">
             <div class="card-img-wrapper col-md-6 ">
-                <img src="{{ asset("storage/$music->image") }}" class="img-fluid" alt="Product Image">
+                <img src="{{$music->img }}" class="img-fluid" alt="Product Image">
             </div>
             <div class="col-md-6">
                 <h2>{{ $music->title ?? '-' }}</h2>
@@ -95,7 +96,7 @@
                 <hr>
                 <p class="text-center">Payment Gateways</p>
                 <hr>
-                @if ($music->amount == 0)
+                @if ($music->free)
                     <div id="wrap">
                         <form action="{{ route('mp3.download', ['mp3' => $music->id]) }}" method="get">
                             @csrf
@@ -107,6 +108,14 @@
                             </button>
                         </form>
                     </div>
+                @else
+                @if ($music->sold)
+
+                <button type="submit" class="btn btn-outline-success btn-sm">
+
+                    <span class="title2 gee">Sold</span>
+
+                </button>
                 @else
                     <nav class="text-center">
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -216,6 +225,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 @endif
                 {{-- @if (session('download_valid') && session('music_id') == $music->id)
                     <form action="{{ route('music.download', ['music' => $music->id]) }}" method="get">
@@ -262,7 +272,7 @@
         </div>
 
     </div>
-
+@endif
 
     @livewire('comment-section', ['musicId' => $music->id])
     <br>

@@ -19,6 +19,7 @@ use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\ToggleButtons;
 
 class CreateMusic extends CreateRecord
 {
@@ -67,6 +68,26 @@ class CreateMusic extends CreateRecord
                  ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])->required(),
                  FileUpload::make('file')->preserveFilenames()
                       ->acceptedFileTypes(['audio/mpeg', 'audio/mp3'])->maxSize(10024)->required(),
+            ]),
+            Step::make('Filter')
+            ->description('Options')
+            ->schema([
+
+                ToggleButtons::make('beat')
+                ->label('is it a Beat?')
+
+                ->boolean()
+                ->grouped(),
+               ToggleButtons::make('free')
+                ->label('is it free?')
+
+                ->boolean()
+                ->grouped(),
+                ToggleButtons::make('publish')
+                ->label('Publish this song?')
+
+                ->boolean()
+                ->grouped(),
             ]),
     ];
 }

@@ -189,4 +189,17 @@ class SettingsController extends Controller
 		}
 		return $this->respond($arr_id);
 	}
+    public function siteInfo()
+{
+    $setting = Setting::orderBy('created_at', 'desc')
+        ->select('site', 'image', 'logo', 'favicon', 'description')
+        ->first();
+
+    if (!$setting) {
+        return response()->json(['error' => 'Site settings not found'], 404);
+    }
+
+    return response()->json($setting);
+}
+
 }

@@ -6,8 +6,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\ImageManagerStatic as Image;
-
+// use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\ImageManager as Image;
+use Intervention\Image\Drivers\Gd\Driver;
 class Uploader
 {
 	/**

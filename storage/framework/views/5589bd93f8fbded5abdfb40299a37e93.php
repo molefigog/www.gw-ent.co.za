@@ -32,8 +32,9 @@
         <div class="d-flex">
 
             <!-- App Search-->
-            <?php echo $__env->yieldContent('search'); ?>
-
+            <div class=" d-none d-lg-block">
+             <?php echo $__env->yieldContent('search'); ?>
+            </div>
 
             <?php if(Auth::check()): ?>
                 <div class="dropdown d-inline-block">
@@ -96,11 +97,7 @@
                     </div>
                 </div>
             <?php endif; ?>
-            <div class="dropdown d-inline-block">
-                <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
-                    <i class="mdi mdi-cog-outline"></i>
-                </button>
-            </div>
+            
 
         </div>
     </div>

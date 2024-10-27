@@ -166,93 +166,271 @@
     <br>
     <hr>
 
-    <div class="row g-2">
-        <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $allMusic; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $music): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <div wire:key="<?php echo e($music->id); ?>" class="col-6 col-md-2">
-                <div class="card h-100">
-                    <img src="<?php echo e(asset("storage/$music->image")); ?>" class="card-img-top image-filter"
-                        alt="<?php echo e($music->image); ?>" />
-                    <div class="info-solid relative">
-                        <div class="play-icon track-list" data-id="<?php echo e($music->id); ?>"role="button" tabindex="0"
-                            onclick="fetchTrackData(this);">
-                            <i class="dripicons-media-play icon-size"></i>
-                        </div>
-                        <a class="btn btn-outline-light waves-effect waves-light btn-sm dim" style="height:28px;"
-                            href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
-                            <strong class="price" style="padding: 0px 10px;">R<?php echo e($music->amount ?? '-'); ?>.00</strong>
-                        </a>
-                        <div class="dropup-center dropup price">
-                            <a class="btn btn-outline-light waves-effect waves-light btn-sm dim my-6" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </a>
+    
+    <div id="accordion">
+        <div class="accordion-item">
+            <div class="accordion-item border rounded">
+                <h2 class="accordion-header" id="headingMusic">
+                    <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseMusic" aria-expanded="true" aria-controls="collapseMusic">
+                        All Music
+                    </button>
+                </h2>
+                <hr>
+                <div id="collapseMusic" class="accordion-collapse collapse show" aria-labelledby="headingMusic"
+                    data-bs-parent="#accordion">
+                    <div class="accordion-body">
+                        <div class="row g-2">
+                            <!--[if BLOCK]><![endif]--><?php if($allMusic->count() > 0): ?>
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $allMusic; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $music): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div wire:key="<?php echo e($music->id); ?>" class="col-6 col-md-2">
+                                        <div class="card h-100">
+                                            <img src="<?php echo e($music->img); ?>" class="card-img-top image-filter"
+                                                alt="<?php echo e($music->image); ?>" />
+                                            <div class="info-solid relative">
+                                                <div class="play-icon track-list" data-id="<?php echo e($music->id); ?>"
+                                                    role="button" tabindex="0" onclick="fetchTrackData(this);">
+                                                    <i class="dripicons-media-play icon-size"></i>
+                                                </div>
+                                                <!--[if BLOCK]><![endif]--><?php if($music->free): ?>
+                                                    <form action="<?php echo e(route('mp3.download', ['mp3' => $music->id])); ?>"
+                                                        method="get">
+                                                        <?php echo csrf_field(); ?>
+                                                        <input type="hidden" name="music_id"
+                                                            value="<?php echo e($music->id); ?>">
+                                                        <button type="submit"
+                                                            class="btn btn-outline-light waves-effect waves-light btn-sm dim"
+                                                            style="height:28px;">
+                                                            Download
+                                                        </button>
+                                                    </form>
+                                                <?php else: ?>
+                                                    <a class="btn btn-outline-light waves-effect waves-light btn-sm dim"
+                                                        style="height:28px;"
+                                                        href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
+                                                        <strong class="price"
+                                                            style="padding: 0px 10px;">R<?php echo e($music->amount ?? '-'); ?>.00</strong>
+                                                    </a>
+                                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                                <div class="dropup-center dropup price">
+                                                    <a class="btn btn-outline-light waves-effect waves-light btn-sm dim my-6"
+                                                        href="#" role="button" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </a>
 
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><i class="far fa-clock"></i> <?php echo e($music->duration); ?></a></li>
-                                <li><a class="dropdown-item" href="#"><i class="far fa-file-audio"></i>  <?php echo e($music->size); ?>MB</a></li>
-                                <li>
-                                    <button style="font-size: 9px; margin-right: 4px;"
-                                        class="dropdown-item"
-                                        wire:click="incrementLikes(<?php echo e($music->id); ?>)">
-                                        <span style="color: #007bff;">
-                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                                            <?php echo e($music->likes); ?></span>
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#"><i
+                                                                    class="far fa-clock"></i> <?php echo e($music->duration); ?></a>
+                                                        </li>
+                                                        <li><a class="dropdown-item" href="#"><i
+                                                                    class="far fa-file-audio"></i>
+                                                                <?php echo e($music->size); ?>MB</a></li>
+                                                        <li>
+                                                            <button style="font-size: 9px; margin-right: 4px;"
+                                                                class="dropdown-item"
+                                                                wire:click="incrementLikes(<?php echo e($music->id); ?>)">
+                                                                <span style="color: #007bff;">
+                                                                    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                                                    <?php echo e($music->likes); ?></span>
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
 
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <a href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
-                            <h6 class="card-text">
-                                <small><?php echo e($music->artist ?? '-'); ?></small>
-                            </h6>
-                            <p class="card-text text-truncate">
-                                <small><?php echo e($music->title ?? '-'); ?></small>
-                            </p>
-                        </a>
-                    </div>
-                    <?php
-                        $baseUrl = config('app.url');
-                        $url = "{$baseUrl}/msingle/{$music->slug}";
-                        $shareButtons = \Share::page($url, 'Check out this music: ' . $music->title)
-                            ->facebook()
-                            ->twitter()
-                            ->whatsapp();
-                    ?>
-                    <div class="cardfooter">
-                        <div class="social-icons">
+                                            </div>
+                                            <div class="card-body d-flex flex-column">
+                                                <a
+                                                    href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
+                                                    <h6 class="card-text">
+                                                        <small><?php echo e($music->artist ?? '-'); ?></small>
+                                                    </h6>
+                                                    <p class="card-text text-truncate">
+                                                        <small><?php echo e($music->title ?? '-'); ?></small>
+                                                    </p>
+                                                </a>
+                                            </div>
+                                            <?php
+                                                $baseUrl = config('app.url');
+                                                $url = "{$baseUrl}/msingle/{$music->slug}";
+                                                $shareButtons = \Share::page(
+                                                    $url,
+                                                    'Check out this music: ' . $music->title,
+                                                )
+                                                    ->facebook()
+                                                    ->twitter()
+                                                    ->whatsapp();
+                                            ?>
+                                            <div class="cardfooter">
+                                                <div class="social-icons">
 
-                            <div class="dropup-center dropup">
+                                                    <div class="dropup-center dropup">
 
-                                <a class="" href="#" role="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <i class="fas fa-share"></i>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <div class="d-flex justify-content-evenly">
-                                        <?php echo $shareButtons; ?>
+                                                        <a class="" href="#" role="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            share <i class="fas fa-share-alt"></i>
+                                                        </a>
+                                                        <ul class="dropdown-menu">
+                                                            <div class="d-flex justify-content-evenly">
+                                                                <?php echo $shareButtons; ?>
 
-                                        <a href="#" class="" onclick="copyToClipboard()"><i
-                                                class="fas fa-copy"></i></a>
+                                                                <a href="#" class=""
+                                                                    onclick="copyToClipboard()"><i
+                                                                        class="fas fa-copy"></i></a>
+                                                            </div>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </ul>
-                            </div>
+                                    <div id="spinner" class="spinner" style="display: none;"></div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php else: ?>
+                                <p><?php echo app('translator')->get('no_items_found'); ?></p>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="spinner" class="spinner" style="display: none;"></div>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+        </div>
+        <hr>
+        <div class="flex justify-content-center ">
+            <div class="pagination-sm"><?php echo e($allMusic->links()); ?></div>
+        </div>
+        <hr>
+        <div class="accordion-item">
+            <div class="accordion-item border rounded">
+                <h2 class="accordion-header" id="headingBeats">
+                    <button class="accordion-button btn-success" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseBeats" aria-expanded="false" aria-controls="collapseBeats">
+                        Beats
+                    </button>
+                </h2>
+                <hr>
+                <div id="collapseBeats" class="accordion-collapse collapse" aria-labelledby="headingBeats"
+                    data-bs-parent="#accordion">
+                    <div class="accordion-body">
+                        <div class="row g-2">
+                            <!--[if BLOCK]><![endif]--><?php if($beats->count() > 0): ?>
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $beats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $music): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div wire:key="<?php echo e($music->id); ?>" class="col-6 col-md-2">
+                                        <div class="card h-100">
+                                            <img src="<?php echo e($music->img); ?>" class="card-img-top image-filter"
+                                                alt="<?php echo e($music->image); ?>" />
+                                            <div class="info-solid relative">
+                                                <div class="play-icon track-list" data-id="<?php echo e($music->id); ?>"
+                                                    role="button" tabindex="0" onclick="fetchTrackData(this);">
+                                                    <i class="dripicons-media-play icon-size"></i>
+                                                </div>
+                                                <!--[if BLOCK]><![endif]--><?php if($music->free): ?>
+                                                    <form action="<?php echo e(route('mp3.download', ['mp3' => $music->id])); ?>"
+                                                        method="get">
+                                                        <?php echo csrf_field(); ?>
+                                                        <input type="hidden" name="music_id"
+                                                            value="<?php echo e($music->id); ?>">
+                                                        <button type="submit"
+                                                            class="btn btn-outline-light waves-effect waves-light btn-sm dim"
+                                                            style="height:28px;">
+                                                            Download
+                                                        </button>
+                                                    </form>
+                                                <?php else: ?>
+                                                    <a class="btn btn-outline-light waves-effect waves-light btn-sm dim"
+                                                        style="height:28px;"
+                                                        href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
+                                                        <strong class="price"
+                                                            style="padding: 0px 10px;">R<?php echo e($music->amount ?? '-'); ?>.00</strong>
+                                                    </a>
+                                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                                <div class="dropup-center dropup price">
+                                                    <a class="btn btn-outline-light waves-effect waves-light btn-sm dim my-6"
+                                                        href="#" role="button" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </a>
 
-            <?php echo app('translator')->get('no_items_found'); ?>
-        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#"><i
+                                                                    class="far fa-clock"></i>
+                                                                <?php echo e($music->duration); ?></a></li>
+                                                        <li><a class="dropdown-item" href="#"><i
+                                                                    class="far fa-file-audio"></i>
+                                                                <?php echo e($music->size); ?>MB</a></li>
+                                                        <li>
+                                                            <button style="font-size: 9px; margin-right: 4px;"
+                                                                class="dropdown-item"
+                                                                wire:click="incrementLikes(<?php echo e($music->id); ?>)">
+                                                                <span style="color: #007bff;">
+                                                                    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                                                    <?php echo e($music->likes); ?></span>
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="card-body d-flex flex-column">
+                                                <a
+                                                    href="<?php echo e(route('msingle.slug', ['slug' => urlencode($music->slug)])); ?>">
+                                                    <h6 class="card-text">
+                                                        <small><?php echo e($music->artist ?? '-'); ?></small>
+                                                    </h6>
+                                                    <p class="card-text text-truncate">
+                                                        <small><?php echo e($music->title ?? '-'); ?></small>
+                                                    </p>
+                                                </a>
+                                            </div>
+                                            <?php
+                                                $baseUrl = config('app.url');
+                                                $url = "{$baseUrl}/msingle/{$music->slug}";
+                                                $shareButtons = \Share::page(
+                                                    $url,
+                                                    'Check out this music: ' . $music->title,
+                                                )
+                                                    ->facebook()
+                                                    ->twitter()
+                                                    ->whatsapp();
+                                            ?>
+                                            <div class="cardfooter">
+                                                <div class="social-icons">
+
+                                                    <div class="dropup-center dropup">
+
+                                                        <a class="" href="#" role="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            share <i class="fas fa-share-alt"></i>
+                                                        </a>
+                                                        <ul class="dropdown-menu">
+                                                            <div class="d-flex justify-content-evenly">
+                                                                <?php echo $shareButtons; ?>
+
+                                                                <a href="#" class=""
+                                                                    onclick="copyToClipboard()"><i
+                                                                        class="fas fa-copy"></i></a>
+                                                            </div>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="spinner" class="spinner" style="display: none;"></div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php else: ?>
+                                <p><?php echo app('translator')->get('no_items_found'); ?></p>
+                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-content-center ">
+            <div class="pagination-sm"><?php echo e($beats->links()); ?></div>
+        </div>
     </div>
-    <br>
-    <div class="flex justify-content-center ">
-        <div class="pagination-sm"><?php echo e($allMusic->links()); ?></div>
-    </div>
+
+
+
     <?php
         $setting = App\Models\Setting::firstOrFail();
         $appName = config('app.name');
@@ -281,7 +459,6 @@
     <?php $__env->startPush('player'); ?>
         <script src="<?php echo e(asset('assets/js/mediaelement-and-player.js')); ?>"></script>
 
-        
         <script>
             var trackPlaying = '',
                 audioPlayer = document.getElementById('audio-player');

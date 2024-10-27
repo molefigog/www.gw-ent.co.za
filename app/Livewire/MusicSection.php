@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Genre;
 use App\Models\User;
+use Livewire\Attributes\Title;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -20,41 +21,36 @@ use Livewire\WithPagination;
 class MusicSection extends Component
 {
     use WithPagination;
+    #[Title('Beats')]
+    protected $paginationTheme = 'bootstrap';
 
-protected $paginationTheme = 'bootstrap';
-
-    public $search;
+    public $search = "";
 
     public $music;
-
+    public $products;
+    public $downloads;
+    public $genres;
+    public $page;
 
     public function incrementLikes(Request $request, $musicId)
     {
-        $this->music = Music::findOrFail($musicId);
+        $this->music = Beat::findOrFail($musicId);
         $this->music->increment('likes');
         $this->music->save();
     }
 
     public function render()
     {
-
-        $allMusic = Music::latest()->where('artist', 'like', "%{$this->search}%")->paginate(15);
+        $beats = Beat::latest()->paginate(18);
         $products = Product::latest()->paginate(10)->withQueryString();
+        $page = 'beats';
 
-        $downloads = Music::where('downloads', '>', 0)
-            ->orderBy('downloads', 'desc')
-            ->take(6)
-            ->get();
-        $genres = Genre::withCount('music')
-            ->latest()
-            ->paginate(10) // You might want to adjust the pagination as needed
-            ->withQueryString();
 
             return view('livewire.music-section', [
-                'allMusic' => $allMusic,
+                'beats' => $beats,
                 'products' => $products,
-                'downloads' => $downloads,
-                'genres' => $genres
+                'page' => $page,
+
             ]);
     }
 }

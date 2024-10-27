@@ -32,33 +32,37 @@ class Music extends Model
         'downloads',
         'md',
         'slug',
+        'free',
+        'beat',
+        'publish',
+        'sold',
+    ];
+    protected $casts = [
+        'free' => 'boolean',
+        'beat' => 'boolean',
+        'publish' => 'boolean',
+        'sold' => 'boolean',
+    ];
 
+    public function getImgAttribute()
+    {
+        return $this->image ? asset("storage/{$this->image}") : 'https://via.placeholder.com/400x400';
+    }
+
+    protected $appends = [
+        'img',
     ];
     protected static function boot()
     {
         parent::boot();
-
-        // Event listener for creating a new record
         static::creating(function ($music) {
             $music->slug = Str::slug(str_replace(' ', '-', $music->title));
         });
 
-        // Event listener for updating an existing record
         static::updating(function ($music) {
             $music->slug = Str::slug(str_replace(' ', '-', $music->title));
         });
     }
-    // public function getDynamicSEOData(): SEOData
-    // {
-    //     $pathToFeaturedImageRelativeToPublicPath = // ..;
-
-    //     // Override only the properties you want:
-    //     return new SEOData(
-    //         title: $this->title,
-    //         description: $this->excerpt,
-    //         image: $pathToFeaturedImageRelativeToPublicPath,
-    //     );
-    // }
 
     protected $searchableFields = ['*'];
 
@@ -79,9 +83,10 @@ class Music extends Model
     {
         return $this->belongsToMany(User::class, 'music_user')->withTimestamps();
     }
-	public static function search($query, $text){
-		//search table record
-		$search_condition = '(
+    public static function search($query, $text)
+    {
+        //search table record
+        $search_condition = '(
 				artist LIKE ?  OR
 				title LIKE ?  OR
 				amount LIKE ?  OR
@@ -92,120 +97,147 @@ class Music extends Model
 				size LIKE ?  OR
 				slug LIKE ?
 		)';
-		$search_params = [
-			"%$text%","%$text%","%$text%","%$text%","%$text%","%$text%","%$text%","%$text%","%$text%"
-		];
-		//setting search conditions
-		$query->whereRaw($search_condition, $search_params);
-	}
+        $search_params = [
+            "%$text%",
+            "%$text%",
+            "%$text%",
+            "%$text%",
+            "%$text%",
+            "%$text%",
+            "%$text%",
+            "%$text%",
+            "%$text%"
+        ];
+        //setting search conditions
+        $query->whereRaw($search_condition, $search_params);
+    }
 
 
-	/**
+    /**
      * return list page fields of the model.
      *
      * @return array
      */
-	public static function listFields(){
-		return [
-			"artist",
-			"title",
-			"amount",
-			"image",
-			"file",
-			"downloads",
-			"id"
-		];
-	}
+    public static function listFields()
+    {
+        return [
+            "artist",
+            "title",
+            "amount",
+            "image",
+            "file",
+            "downloads",
+            "id",
+            "free",
+            "beat",
+            "publish",
+        ];
+    }
 
 
-	/**
+    /**
      * return exportList page fields of the model.
      *
      * @return array
      */
-	public static function exportListFields(){
-		return [
-			"artist",
-			"title",
-			"amount",
-			"image",
-			"file",
-			"downloads",
-			"id"
-		];
-	}
+    public static function exportListFields()
+    {
+        return [
+            "artist",
+            "title",
+            "amount",
+            "image",
+            "file",
+            "downloads",
+            "id",
+            "free",
+            "beat",
+            "publish",
+        ];
+    }
 
 
-	/**
+    /**
      * return view page fields of the model.
      *
      * @return array
      */
-	public static function viewFields(){
-		return [
-			"genre_id",
-			"artist",
-			"title",
-			"amount",
-			"image",
-			"file",
-			"downloads",
-			"id"
-		];
-	}
+    public static function viewFields()
+    {
+        return [
+            "genre_id",
+            "artist",
+            "title",
+            "amount",
+            "image",
+            "file",
+            "downloads",
+            "id",
+            "free",
+            "beat",
+            "publish",
+        ];
+    }
 
 
-	/**
+    /**
      * return exportView page fields of the model.
      *
      * @return array
      */
-	public static function exportViewFields(){
-		return [
-			"genre_id",
-			"artist",
-			"title",
-			"amount",
-			"image",
-			"file",
-			"downloads",
-			"id"
-		];
-	}
+    public static function exportViewFields()
+    {
+        return [
+            "genre_id",
+            "artist",
+            "title",
+            "amount",
+            "image",
+            "file",
+            "downloads",
+            "id",
+            "free",
+            "beat",
+            "publish",
+        ];
+    }
 
 
-	/**
+    /**
      * return edit page fields of the model.
      *
      * @return array
      */
-	public static function editFields(){
-		return [
-			"genre_id",
-			"artist",
-			"title",
-			"amount",
-			"image",
-			"demo",
-			"file",
-			"description",
-			"duration",
-			"size",
-			"downloads",
-			"md",
-			"slug",
-			"id"
-		];
-	}
+    public static function editFields()
+    {
+        return [
+            "genre_id",
+            "artist",
+            "title",
+            "amount",
+            "image",
+            "demo",
+            "file",
+            "description",
+            "duration",
+            "size",
+            "downloads",
+            "md",
+            "slug",
+            "id",
+            "free",
+            "beat",
+            "publish",
+        ];
+    }
 
 
-	/**
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
      */
-	public $timestamps = true;
-	const CREATED_AT = 'created_at';
-	const UPDATED_AT = 'updated_at';
-
+    public $timestamps = true;
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 }

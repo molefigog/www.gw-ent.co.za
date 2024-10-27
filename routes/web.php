@@ -28,7 +28,7 @@ use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\BookingController;
 use App\Livewire\Mmino;
-use App\Livewire\ShowMusic;
+use App\Livewire\MusicSection;
 use App\Http\Controllers\SocialShareController;
 use App\Http\Controllers\MpesaController;
 use App\Http\Controllers\SpotifyController;
@@ -51,6 +51,7 @@ Route::get('/songs/{artist}', function ($artistName) {
     return view('songs_by_artist', ['artistName' => $artistName]);
 });
 Route::get('/', Mmino::class)->name('gee');
+Route::get('beats', MusicSection::class)->name('beats');
 // Route::get('/msingle/{slug}', ShowMusic::class)->name('msingle.slug');
 
 Route::get('/mpesa/success', [MpesaController::class, 'showSuccessPage'])->name('mpesa.success');

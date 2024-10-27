@@ -13,9 +13,9 @@ use App\Recipients\EmailRecipient;
 use App\Notifications\RecordActionMail;
 use App\Notifications\OTPVerification;
 use Exception;
-abstract class Controller
+class Controller extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+	use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
 	/**
 	 * List of supported export format

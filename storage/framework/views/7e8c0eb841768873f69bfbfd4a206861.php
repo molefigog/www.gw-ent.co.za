@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
 
@@ -53,17 +53,23 @@
 
 
 
-<body data-topbar="dark" data-bs-theme="dark"data-layout="horizontal">
+<body data-topbar="dark"data-layout="horizontal">
     <!-- Begin page -->
     <div id="layout-wrapper">
 
         <?php echo $__env->make('layouts.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
         <div class="main-content">
+
+
             <hr>
-            <br>
+
             <div class="page-content">
                 <div class="container-fluid text-center">
+                    <div class="d-block d-sm-none">
+                        <?php echo $__env->yieldContent('search'); ?>
+                       </div>
+
                     <?php echo e($slot); ?>
 
                     <?php echo $__env->make('layouts.modal', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
@@ -117,33 +123,7 @@
     <!-- END layout-wrapper -->
 
     <!-- Right Sidebar -->
-    <div class="right-bar">
-        <div data-simplebar class="h-100">
-            <div class="rightbar-title px-3 py-4">
-                <a href="javascript:void(0);" class="right-bar-toggle float-end">
-                    <i class="mdi mdi-close noti-icon"></i>
-                </a>
-                <h5 class="m-0">Settings</h5>
-            </div>
-            <!-- Settings -->
-            <hr class="mt-0" />
-
-            <div class="p-4">
-
-                <div class="form-check form-switch mb-3">
-                    <input type="checkbox" class="form-check-input theme-choice" id="light-mode-switch" checked />
-                    <label class="form-check-label" for="light-mode-switch">Light Mode</label>
-                </div>
-                <div class="form-check form-switch mb-3">
-                    <input type="checkbox" class="form-check-input theme-choice" id="dark-mode-switch"
-                        data-bsStyle="<?php echo e(asset('assets/css/bootstrap-dark.min.css')); ?>"
-                        data-appStyle="<?php echo e(asset('assets/css/app-dark.min.css')); ?>" />
-                    <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
-                </div>
-            </div>
-
-        </div> <!-- end slimscroll-menu-->
-    </div>
+    
 
     <?php echo $__env->yieldPushContent('modals'); ?>
 
@@ -162,7 +142,7 @@
         const BootstrapRtl = "<?php echo e(asset('assets/css/bootstrap-rtl.min.css')); ?>";
         const AppRtl = "<?php echo e(asset('assets/css/app-rtl.min.css')); ?>";
     </script>
-    <script src="<?php echo e(asset('assets/js/app.js')); ?>"></script>
+    
     <?php echo $__env->yieldPushContent('player'); ?>
 
     <?php echo $__env->yieldPushContent('modal'); ?>

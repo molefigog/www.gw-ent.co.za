@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
 
@@ -62,7 +62,7 @@
     $artists = App\Models\User::orderBy('name')->get();
 @endphp --}}
 
-<body data-topbar="dark" data-bs-theme="dark"data-layout="horizontal">
+<body data-topbar="dark"data-layout="horizontal">
     <!-- Begin page -->
     <div id="layout-wrapper">
 
