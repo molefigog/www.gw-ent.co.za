@@ -237,7 +237,8 @@ Route::post('fileuploader/remove_temp_file', [FileUploaderController::class, 're
 Route::post('/get_data', [MusicController::class, 'getMusicData']);
 Route::post('/get_beat', [BeatsController::class, 'getBeatData']);
 Route::post('/check-music-file', [MusicController::class, 'checkFile'])->name('check-music-file');
-Route::get('site-info/', [SettingsController::class, 'siteInfo']);
+
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');

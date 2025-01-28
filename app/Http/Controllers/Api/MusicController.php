@@ -6,13 +6,19 @@ use App\Http\Controllers\Controller;
 use Owenoj\LaravelGetId3\GetId3;
 use falahati\PHPMP3\MpegAudio;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\MusicAddRequest;
 use App\Http\Requests\MusicEditRequest;
+use GuzzleHttp\Client;
+use App\Models\User;
 use App\Models\Music;
+use App\Models\Downloads;
 use Illuminate\Http\Request;
 use Exception;
 use App\Http\Resources\MusicCollection;
+use App\Http\Resources\MusicResource;
+
 class MusicController extends Controller
 {
 
@@ -20,14 +26,38 @@ class MusicController extends Controller
     {
         $tracks = Music::latest()
 
-        ->paginate();
+            ->paginate(18);
+
         return new MusicCollection($tracks);
     }
+
+    public function Trackview(Request $request,Music $track): MusicResource
+    {
+        Log::info('Trackview method accessed');
+
+        return new MusicResource($track);
+    }
+
+    public function showBySlug($slug)
+    {
+        $track = Music::where('slug', $slug)->firstOrFail();
+
+        if (!$track) {
+            Log::warning('Track not found for slug: ' . $slug);
+            return response()->json(['error' => 'Music not found'], 404);
+        }
+
+        return response()->json([
+            'track' => $track,
+            'buttonType' => $track->getButtonType(),
+        ]);
+    }
+
 
     function index(Request $request, $fieldname = null, $fieldvalue = null)
     {
         // Get the authenticated user
-        $user = auth()->user();
+        $user = Auth::user();
         // Initialize the query
         $query = Music::query();
         // Apply search if provided
@@ -66,64 +96,36 @@ class MusicController extends Controller
         return $this->respond($record);
     }
 
-    /**
-     * Save form record to the table
-     * @return \Illuminate\Http\Response
-     */
-    // function add(MusicAddRequest $request)
-    // {
-    //     $modeldata = $request->validated();
-
-    //     if (array_key_exists("image", $modeldata)) {
-    //         // Move uploaded file from temp directory to destination directory
-    //         $fileInfo = $this->moveUploadedFiles($modeldata['image'], "image");
-    //         $modeldata['image'] = $fileInfo['filepath'];
-    //     }
-
-    //     if (array_key_exists("file", $modeldata)) {
-    //         // Move uploaded file from temp directory to destination directory
-    //         $fileInfo = $this->moveUploadedFiles($modeldata['file'], "file");
-    //         $modeldata['file'] = $fileInfo['filepath'];
-    //     }
-    //     // Save Music record
-    //     $user = auth()->user();
-    //     $record = $user->musics()->create($modeldata);
-    //     $this->afterAdd($record);
-    //     return $this->respond($record);
-    // }
     function add(MusicAddRequest $request)
-{
-    // Log the validated input data
-    Log::info('MusicAddRequest Data:', $request->all());
+    {
+        // Log the validated input data
+        Log::info('MusicAddRequest Data:', $request->all());
 
-    $modeldata = $request->validated();
+        $modeldata = $request->validated();
 
-    if (array_key_exists("image", $modeldata)) {
-        // Move uploaded file from temp directory to destination directory
-        $fileInfo = $this->moveUploadedFiles($modeldata['image'], "image");
-        $modeldata['image'] = $fileInfo['filepath'];
+        if (array_key_exists("image", $modeldata)) {
+            // Move uploaded file from temp directory to destination directory
+            $fileInfo = $this->moveUploadedFiles($modeldata['image'], "image");
+            $modeldata['image'] = $fileInfo['filepath'];
+        }
+
+        if (array_key_exists("file", $modeldata)) {
+            // Move uploaded file from temp directory to destination directory
+            $fileInfo = $this->moveUploadedFiles($modeldata['file'], "file");
+            $modeldata['file'] = $fileInfo['filepath'];
+        }
+
+        // Save Music record
+        $user = Auth::user();
+        $record = $user->musics()->create($modeldata);
+
+        // Log the created record data
+        Log::info('Created Music Record:', $record->toArray());
+
+        $this->afterAdd($record);
+        return $this->respond($record);
     }
 
-    if (array_key_exists("file", $modeldata)) {
-        // Move uploaded file from temp directory to destination directory
-        $fileInfo = $this->moveUploadedFiles($modeldata['file'], "file");
-        $modeldata['file'] = $fileInfo['filepath'];
-    }
-
-    // Save Music record
-    $user = auth()->user();
-    $record = $user->musics()->create($modeldata);
-
-    // Log the created record data
-    Log::info('Created Music Record:', $record->toArray());
-
-    $this->afterAdd($record);
-    return $this->respond($record);
-}
-    /**
-     * After new record created
-     * @param array $record // newly created record
-     */
     private function afterAdd($record)
     {
         $filePath = public_path($record->file);
@@ -155,11 +157,7 @@ class MusicController extends Controller
             Log::error('Failed to update record: ' . $e->getMessage());
         }
     }
-    /**
-     * Update table record with form data
-     * @param string $rec_id //select record by table primary key
-     * @return \Illuminate\View\View;
-     */
+
     function edit(MusicEditRequest $request, $rec_id = null)
     {
         $query = Music::query();
@@ -182,13 +180,7 @@ class MusicController extends Controller
         }
         return $this->respond($record);
     }
-    /**
-     * Delete record from the database
-     * Support multi delete by separating record id by comma.
-     * @param  \Illuminate\Http\Request
-     * @param string $rec_id //can be separated by comma
-     * @return \Illuminate\Http\Response
-     */
+
     function delete(Request $request, $rec_id = null)
     {
         $arr_id = explode(",", $rec_id);
@@ -202,16 +194,38 @@ class MusicController extends Controller
         }
         return $this->respond($arr_id);
     }
+    public function downloadMp3($trackId)
+{
+    $track = Music::find($trackId);
+
+    if (!$track) {
+        return response()->json(['error' => 'Music track not found.'], 404);
+    }
+
+    if ($track->beat) {
+        $track->sold = true;
+    } else {
+        $track->downloads++;
+    }
+    $track->md++;
+    $track->save();
+    $trackFilePath = $track->file;
+
+    if (!Storage::exists($trackFilePath)) {
+        return response()->json(['error' => 'Music file not found.'], 404);
+    }
+    return Storage::download($trackFilePath, $track->artist . '-' . $track->title . '.mp3');
+}
 
     public function getMusicData(Request $request)
     {
-        $music = Music::find($request->id);
-        if ($music) {
+        $track = Music::find($request->id);
+        if ($track) {
             return response()->json([
-                'demo' => asset('storage/demos/' . $music->demo),
-                'image' => asset('storage/' . $music->image),
-                'title' => $music->title ?? '-',
-                'artist' => $music->artist ?? '-',
+                'demo' => asset('storage/demos/' . $track->demo),
+                'image' => asset('storage/' . $track->image),
+                'title' => $track->title ?? '-',
+                'artist' => $track->artist ?? '-',
             ]);
         }
 
@@ -220,10 +234,10 @@ class MusicController extends Controller
 
     public function checkFile(Request $request)
     {
-        $music = Music::find($request->musicId);
+        $track = Music::find($request->musicId);
 
-        if ($music) {
-            $filePath = $music->file; // Ensure this is the correct attribute for the file path
+        if ($track) {
+            $filePath = $track->file; // Ensure this is the correct attribute for the file path
             if (Storage::exists($filePath)) {
                 return response()->json(['status' => 'success']);
             } else {
@@ -233,4 +247,185 @@ class MusicController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Music record not found']);
         }
     }
+
+    public function pay(Request $request)
+{
+    $request->validate([
+        'mpesaNumber' => 'required|string',
+        'trackId' => 'required|integer|exists:music,id', // Validate track ID
+    ]);
+
+    try {
+        // Fetch music details based on trackId
+        $music = Music::findOrFail($request->trackId);
+
+        $baseUrl = 'https://api.paylesotho.co.ls';
+        $merchantid = config('payments.mpesa_sc');
+        $merchantname = config('payments.merchant_name');
+        $token = config('payments.token');
+
+        $client = new Client();
+        $paymentApiUrl = $baseUrl . '/api/v1/vcl/payment';
+        $paymentApiData = [
+            'merchantid' => $merchantid,
+            'amount' => $music->amount, // Use the amount from the Music model
+            'mobileNumber' => $request->mpesaNumber, // Use the validated mobile number
+            'merchantname' => $merchantname,
+            'client_reference' => uniqid('pay_', true), // Generate a unique client reference
+        ];
+
+        Log::info('Payment API Request: ' . json_encode([
+            'url' => $paymentApiUrl,
+            'data' => $paymentApiData,
+        ]));
+
+        $response = $client->post($paymentApiUrl, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => $paymentApiData,
+        ]);
+
+        $responseData = json_decode($response->getBody(), true);
+        Log::info('Payment API Response: ' . json_encode($responseData));
+
+        if (isset($responseData['status_code']) && $responseData['status_code'] === 'INS-0') {
+            $payRef = $responseData['reference'];
+            $verificationUrl = $baseUrl . '/api/v1/vcl/verify/' . $payRef . '/62915';
+
+            $verificationResponse = $client->get($verificationUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                ],
+            ]);
+
+            $verificationData = json_decode($verificationResponse->getBody(), true);
+            Log::info('Confirmation API Response: ' . json_encode($verificationData));
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('Error decoding verification response: ' . json_last_error_msg());
+                return response()->json(['error' => 'Failed to verify the transaction'], 500);
+            }
+
+            if ($verificationData['status_code'] === 'INS-0') {
+                $this->updateUserBalance($music->id, $music->amount); // Use the music ID
+                $this->userMusic($music->id, $request->mpesaNumber); // Pass the mobile number too
+                $this->dispatch('success2');
+                return $this->downloadSong($music->id); // Use the music ID
+            } else {
+                return response()->json(['error' => 'Transaction verification failed'], 500);
+            }
+        } else {
+            return response()->json(['error' => $responseData['message'] ?? 'Payment API request failed'], 500);
+        }
+    } catch (\Exception $e) {
+        Log::error('Guzzle Request Error: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to make the API request'], 500);
+    }
+}
+private function updateUserBalance($musicId, $amount)
+{
+    $music = Music::find($musicId);
+    if (!$music) {
+        Log::error('Music track not found for ID: ' . $musicId);
+        return;
+    }
+    $pivot = $music->users()->wherePivot('music_id', $musicId)->first()->pivot;
+    if (!$pivot) {
+        Log::error('Pivot record not found for music ID: ' . $musicId);
+        return;
+    }
+    $uploaderId = $pivot->user_id;
+    $user = User::find($uploaderId);
+    if (!$user) {
+        Log::error('Uploader user not found for ID: ' . $uploaderId);
+        return;
+    }
+    $user->balance += $amount;
+    $user->save();
+    Log::info('User balance updated successfully for User ID: ' . $user->id);
+}
+public function sendSMS2($message, $mobileNumber)
+{
+    $apiKey = config('sms.api_key');
+    $apiSecret = config('sms.api_secret');
+    $to = '+266' . $mobileNumber;
+    $accountApiCredentials = $apiKey . ':' . $apiSecret;
+    $base64Credentials = base64_encode($accountApiCredentials);
+    $authHeader = 'Authorization: Basic ' . $base64Credentials;
+    $sendData = json_encode([
+        'messages' => [
+            [
+                'content' => $message,
+                'destination' => $to,
+            ],
+        ],
+    ]);
+    Log::info('SMS Sending Data: ' . $sendData);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'https://rest.mymobileapi.com/bulkmessages');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $sendData);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        $authHeader
+    ]);
+
+    $result = curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($status === 200) {
+        Log::info('SMS sent successfully');
+        return response()->json(['message' => 'SMS sent successfully']);
+    } else {
+        Log::error('SMS sending failed. Status: ' . $status);
+        return response()->json(['message' => 'SMS sending failed'], 500);
+    }
+}
+public function userMusic($musicId, $mobileNumber)
+{
+    $music = Music::find($musicId);
+    if ($music) {
+        $otp = 'GW' . rand(1000, 9999);
+        $url = config('app.url');
+        $fullurl = $url . '/getdownloads';
+        $downloads = new Downloads([
+            'artist' => $music->artist,
+            'title' => $music->title,
+            'mobile' => $mobileNumber, // Use the mobile number passed as argument
+            'file' => $music->file,
+            'otp' => $otp,
+        ]);
+        $downloads->save();
+        $message = 'Use :' . $otp . ' on ' . $fullurl . ' if download did not start';
+        $this->sendSMS2($message, $mobileNumber); // Use the mobile number passed as argument
+    } else {
+        Log::error('Music track not found for ID: ' . $musicId);
+    }
+}
+
+public function downloadSong($musicId)
+{
+    $music = Music::find($musicId);
+
+    if (!$music) {
+        return response()->json(['error' => 'Music track not found.'], 404);
+    }
+
+    $musicFilePath = $music->file;
+    $music->md++;
+    $music->downloads++;
+    $music->save();
+
+    if (!Storage::exists($musicFilePath)) {
+        return response()->json(['error' => 'Music file not found.'], 404);
+    }
+
+    return Storage::download($musicFilePath, $music->artist . '-' . $music->title . '.mp3');
+}
+
 }

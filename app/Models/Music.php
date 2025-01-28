@@ -48,10 +48,35 @@ class Music extends Model
     {
         return $this->image ? asset("storage/{$this->image}") : 'https://via.placeholder.com/400x400';
     }
+    public function getPreviewAttribute()
+    {
+        return asset("storage/demos/{$this->demo}");
+    }
+    public function getProductAttribute()
+    {
+        return asset("storage/{$this->file}");
+    }
+    public function getGenreTitleAttribute()
+    {
+        return $this->genre ? $this->genre->title : null;
+    }
 
     protected $appends = [
         'img',
+        'preview',
+        'genre_title',
+        'product',
     ];
+    public function getButtonType()
+    {
+        if ($this->sold) {
+            return 'sold';
+        } elseif ($this->free) {
+            return 'download';
+        } else {
+            return 'buy';
+        }
+    }
     protected static function boot()
     {
         parent::boot();

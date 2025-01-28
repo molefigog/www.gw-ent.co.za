@@ -14,7 +14,7 @@ use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 
-class LoginController extends Controller implements HasMiddleware
+class LoginController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
@@ -60,13 +60,15 @@ class LoginController extends Controller implements HasMiddleware
      *
      * @return void
      */
-    public static function middleware(): array
+    public function __construct()
     {
-        return [
-            new Middleware('guest', except: ['logout']),
-            new Middleware('auth', only: ['logout']),
-        ];
+        // Apply the 'guest' middleware to all routes except 'logout'
+        $this->middleware('guest')->except('logout');
+
+        // Apply the 'auth' middleware to the 'logout' route
+        $this->middleware('auth')->only('logout');
     }
+
 
     /**
      * Create a new controller instance.

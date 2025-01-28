@@ -29,12 +29,6 @@ class Payment extends Component
     {
         try {
 
-            // $musicFilePath = public_path("{$this->musicId}");
-            // if (!Storage::exists($musicFilePath)) {
-            //     session()->flash('error', 'Music file not found.');
-            //     return redirect()->back();
-            // }
-
             $baseUrl = 'https://api.paylesotho.co.ls';
             $merchantid = config('payments.mpesa_sc');
             $merchantname = config('payments.merchant_name');

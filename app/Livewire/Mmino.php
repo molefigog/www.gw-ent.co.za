@@ -48,7 +48,7 @@ class Mmino extends Component
         // Fetch beats only
         $beats = Music::where('publish', true)
             ->where('beat', true)
-            ->where('sold', false)
+            // ->where('sold', false)
             ->latest()
             ->paginate(18);
 

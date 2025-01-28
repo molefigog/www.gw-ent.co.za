@@ -166,7 +166,6 @@
     <br>
     <hr>
 
-    
     <div id="accordion">
         <div class="accordion-item">
             <div class="accordion-item border rounded">

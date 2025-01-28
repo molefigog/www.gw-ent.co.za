@@ -95,19 +95,16 @@ class MusicResource extends Resource
     {
         $user = Auth::user();
 
+        // Query filtering based on user role
         $query = Music::query();
-
-        // Filter records based on the authenticated user's role and ownership of music records
         if ($user && $user->role != 1) {
-            // Join with the pivot table and filter records based on the user's ID
             $query->whereHas('users', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             });
         }
 
-        // Check if the authenticated user's role is 1 (admin)
+        // Conditionally add bulk actions for admin users
         if ($user && $user->role == 1) {
-            // Add bulk actions for admin users
             $bulkActions = [
                 Tables\Actions\DeleteBulkAction::make(),
             ];
@@ -117,61 +114,54 @@ class MusicResource extends Resource
         return $table
             ->query($query)
             ->columns([
-
                 ImageColumn::make('image')->size(30),
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('artist')->searchable(),
-                TextColumn::make('genre.title'),
-                CheckboxColumn::make('publish'),
+
+                // Conditionally display 'sold' column only if 'beat' is true for the record
+                TextColumn::make('sold')
+                ->label('Sold')
+                ->formatStateUsing(fn ($state) => $state ? 'True' : 'False'),
+
+                TextColumn::make('beat')
+                ->label('is_beat')
+                ->formatStateUsing(fn ($state) => $state ? 'True' : 'False'),
+                // Conditionally display 'publish' column only if 'beat' is true for the record
+                CheckboxColumn::make('publish')
+                    ->label('Published')
+
             ])
-            ->filters([
-                Filter::make('title')
-                    ->label('Newest First')
-                    ->query(function ($query) {
-                        return $query->where('title')->orderBy('created_at', 'desc');
-                    }),
-                Filter::make('title1')
-                    ->label('Oldest First')
-                    ->query(function ($query) {
-                        return $query->where('title')->orderBy('created_at', 'asc');
-                    })
-            ])
+            ->filters([])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->before(function ($record) {
-                        // You can perform operations before the delete action here
+                        // Custom logic before deletion
                     })
                     ->after(function ($record) {
-                        // Perform operations after the delete action here
+                        // After deletion logic to delete associated files
                         if ($record->image) {
                             Storage::disk('public')->delete($record->image);
-                            if (!Storage::disk('public')->exists($record->image)) {
-                                Log::info("Image '{$record->image}' deleted successfully.");
-                            } else {
-                                Log::warning("Failed to delete image '{$record->image}'.");
-                            }
+                            Log::info(Storage::disk('public')->exists($record->image)
+                                ? "Failed to delete image '{$record->image}'."
+                                : "Image '{$record->image}' deleted successfully.");
                         }
                         if ($record->file) {
                             Storage::disk('public')->delete($record->file);
-                            if (!Storage::disk('public')->exists($record->file)) {
-                                Log::info("File '{$record->file}' deleted successfully.");
-                            } else {
-                                Log::warning("Failed to delete file '{$record->file}'.");
-                            }
+                            Log::info(Storage::disk('public')->exists($record->file)
+                                ? "Failed to delete file '{$record->file}'."
+                                : "File '{$record->file}' deleted successfully.");
                         }
                         if ($record->demo) {
                             Storage::disk('public')->delete("demos/{$record->demo}");
-                            if (!Storage::disk('public')->exists("demos/{$record->demo}")) {
-                                Log::info("Demo '{$record->demo}' deleted successfully.");
-                            } else {
-                                Log::warning("Failed to delete demo '{$record->demo}'.");
-                            }
+                            Log::info(Storage::disk('public')->exists("demos/{$record->demo}")
+                                ? "Failed to delete demo '{$record->demo}'."
+                                : "Demo '{$record->demo}' deleted successfully.");
                         }
                     }),
             ]);
     }
+
 
     public static function getRelations(): array
     {

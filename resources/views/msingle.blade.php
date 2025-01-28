@@ -124,10 +124,7 @@
                                 role="tab" aria-controls="nav-home" aria-selected="true"><img
                                     src="{{ asset('assets/vcl1.png') }}" alt="" style="width: 24px; height: 24px;">
                                 M-Pesa</a>
-                            {{-- <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab"
-                                aria-controls="nav-profile" aria-selected="false"><i
-                                    class="icon-account_balance_wallet"></i>
-                                Wallet</a> --}}
+
 
                             <a class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" href="#nav-contact" role="tab"
                                 aria-controls="nav-contact" aria-selected="false"><i class="icon-paypal"></i> Paypal</a>
@@ -331,51 +328,9 @@
         }
     </script>
 
-    {{-- <script>
-        document.getElementById('buyNowForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
-
-            var form = this;
-            var userId = document.getElementsByName('custom')[0].value;
-
-            if (!userId) {
-                var intendedUrl = '{{ route('msingle.slug', ['slug' => urlencode($music->slug)]) }}';
-                window.sessionStorage.setItem('intended_url', intendedUrl);
-                window.location.href = '{{ route('login') }}';
-            } else {
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('check-music-file') }}',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        musicId: '{{ $music->id }}'
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            form.submit(); // Submit the form if the file exists
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message,
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Music File Not found',
-                        });
-                    },
-                });
-            }
-        });
-    </script> --}}
     <script>
         document.getElementById('buyNowForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
+            event.preventDefault();
 
             var form = this;
             var userId = document.getElementsByName('custom')[0].value;
@@ -421,62 +376,7 @@
     </script>
 @endpush
 @push('mpesa')
-    {{-- <script>
-        $(document).ready(function() {
-            $('#paymentForm').submit(function(e) {
-                e.preventDefault();
 
-                let form = this;
-
-                proceedWithPayment(form);
-            });
-
-            function proceedWithPayment(form) {
-                Swal.fire({
-                    title: 'Processing',
-                    html: 'Please wait...',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    willOpen: () => {
-                        Swal.showLoading();
-                    },
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: $(form).attr('action'),
-                    data: $(form).serialize(),
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log('Payment response:', response); // Add logging here
-                        Swal.close();
-
-                        if (response.status === 'success') {
-                            window.location.href = response.download_url;
-                        } else {
-                            Swal.fire({
-                                icon: response.status,
-                                title: response.status.charAt(0).toUpperCase() + response.status
-                                    .slice(1),
-                                text: response.message,
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.log('Payment error:', xhr, status, error); // Add logging here
-                        Swal.close();
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Failed to make the API request',
-                        });
-                    },
-                });
-            }
-        });
-    </script> --}}
     <script>
         $(document).ready(function() {
             $('#paymentForm').submit(function(e) {
