@@ -238,6 +238,17 @@ Route::post('/get_data', [MusicController::class, 'getMusicData']);
 Route::post('/get_beat', [BeatsController::class, 'getBeatData']);
 Route::post('/check-music-file', [MusicController::class, 'checkFile'])->name('check-music-file');
 
+//api routs
+Route::get('site-info/', [App\Http\Controllers\Api\SettingsController::class, 'siteInfo']);
+Route::get('music-index/', [App\Http\Controllers\Api\MusicController::class, 'musicIndex']);
+// Route::get('track{slug}/', [MusicController::class, 'Trackview']);
+// Route in web.php or api.php
+Route::get('download/{trackId}', [App\Http\Controllers\Api\MusicController::class, 'downloadMp3']);
+
+Route::post('/m-pesa', [App\Http\Controllers\Api\MusicController::class, 'pay']);
+
+Route::get('track/{slug}', [App\Http\Controllers\Api\MusicController::class, 'showBySlug'])
+->where('slug', '[a-zA-Z0-9\-]+');
 
 Route::get('/user', function (Request $request) {
     return $request->user();

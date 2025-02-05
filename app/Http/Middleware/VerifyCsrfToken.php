@@ -11,9 +11,6 @@ class VerifyCsrfToken extends Middleware
          '/mo',
          '/ipn',
          '/success',
-         '/site-info',
-         '/music-index',
-         '/download/{trackId}',
-         '/track/{slug}'
+
     ];
 }
