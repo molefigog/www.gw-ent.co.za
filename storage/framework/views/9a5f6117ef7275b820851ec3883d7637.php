@@ -1,6 +1,8 @@
 <?php
     $isContained = $isContained();
     $statePath = $getStatePath();
+    $previousAction = $getAction('previous');
+    $nextAction = $getAction('next');
 ?>
 
 <div
@@ -19,7 +21,7 @@
             this.step = this.getSteps()[nextStepIndex]
 
             this.autofocusFields()
-            this.scrollToTop()
+            this.scroll()
         },
 
         previousStep: function () {
@@ -32,13 +34,15 @@
             this.step = this.getSteps()[previousStepIndex]
 
             this.autofocusFields()
-            this.scrollToTop()
+            this.scroll()
         },
 
-        scrollToTop: function () {
-            this.$nextTick(() =>
-                this.$root.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-            )
+        scroll: function () {
+            this.$nextTick(() => {
+                this.$refs.header.children[
+                    this.getStepIndex(this.step)
+                ].scrollIntoView({ behavior: 'smooth', block: 'start' })
+            })
         },
 
         autofocusFields: function () {
@@ -130,6 +134,7 @@
             'border-b border-gray-200 dark:border-white/10' => $isContained,
             'rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10' => ! $isContained,
         ]); ?>"
+        x-ref="header"
     >
         <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $getChildComponentContainer()->getComponents(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $step): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <li
@@ -292,8 +297,14 @@
             'mt-6' => ! $isContained,
         ]); ?>"
     >
-        <span x-cloak x-on:click="previousStep" x-show="! isFirstStep()">
-            <?php echo e($getAction('previous')); ?>
+        <span
+            x-cloak
+            <?php if(! $previousAction->isDisabled()): ?>
+                x-on:click="previousStep"
+            <?php endif; ?>
+            x-show="! isFirstStep()"
+        >
+            <?php echo e($previousAction); ?>
 
         </span>
 
@@ -304,20 +315,24 @@
 
         <span
             x-cloak
-            x-on:click="
-                $wire.dispatchFormEvent(
-                    'wizard::nextStep',
-                    '<?php echo e($statePath); ?>',
-                    getStepIndex(step),
-                )
-            "
-            x-show="! isLastStep()"
+            <?php if(! $nextAction->isDisabled()): ?>
+                x-on:click="
+                    $wire.dispatchFormEvent(
+                        'wizard::nextStep',
+                        '<?php echo e($statePath); ?>',
+                        getStepIndex(step),
+                    )
+                "
+            <?php endif; ?>
+            x-bind:class="{ 'hidden': isLastStep(), 'block': ! isLastStep() }"
         >
-            <?php echo e($getAction('next')); ?>
+            <?php echo e($nextAction); ?>
 
         </span>
 
-        <span x-show="isLastStep()">
+        <span
+            x-bind:class="{ 'hidden': ! isLastStep(), 'block': isLastStep() }"
+        >
             <?php echo e($getSubmitAction()); ?>
 
         </span>

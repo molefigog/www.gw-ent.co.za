@@ -12,6 +12,7 @@
 ?>
 
 <div
+    x-bind:tabindex="$el.querySelector('[autofocus]') ? '-1' : '0'"
     x-bind:class="{
         <?php echo \Illuminate\Support\Js::from($activeStepClasses)->toHtml() ?>: step === <?php echo \Illuminate\Support\Js::from($id)->toHtml() ?>,
         <?php echo \Illuminate\Support\Js::from($inactiveStepClasses)->toHtml() ?>: step !== <?php echo \Illuminate\Support\Js::from($id)->toHtml() ?>,
@@ -29,7 +30,6 @@
                 'aria-labelledby' => $id,
                 'id' => $id,
                 'role' => 'tabpanel',
-                'tabindex' => '0',
             ], escape: false)
             ->merge($getExtraAttributes(), escape: false)
             ->class(['fi-fo-wizard-step outline-none'])); ?>

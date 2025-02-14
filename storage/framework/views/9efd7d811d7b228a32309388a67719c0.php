@@ -192,6 +192,8 @@ unset($__defined_vars); ?>
                     'disabled' => $disabled,
                     'form' => $formId,
                     'type' => $type,
+                    'wire:loading.attr' => 'disabled',
+                    'wire:target' => ($hasLoadingIndicator && $loadingIndicatorTarget) ? $loadingIndicatorTarget : null,
                 ], escape: false)
                 ->merge([
                     'title' => $label,

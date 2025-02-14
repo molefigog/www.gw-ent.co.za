@@ -3,7 +3,18 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    <IfModule mod_headers.c>
+        Header always set Access-Control-Allow-Origin "*"
+        Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, DELETE, PUT"
+        Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+        Header always set Access-Control-Expose-Headers "Content-Length, X-Kuma-Revision"
+    </IfModule>
+
     RewriteEngine On
+
+    # Handle Preflight Requests for CORS
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,END]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

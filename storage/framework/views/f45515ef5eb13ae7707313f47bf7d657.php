@@ -136,7 +136,7 @@ unset($__defined_vars); ?>
         }"
     <?php endif; ?>
     <?php echo e($attributes
-            ->except(['wire:target'])
+            ->except(['wire:target', 'tabindex'])
             ->class([
                 'fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75',
                 $enabledWrapperClasses => (! $hasAlpineClasses) && (! $disabled),
@@ -157,7 +157,7 @@ unset($__defined_vars); ?>
                 wire:key="<?php echo e(\Illuminate\Support\Str::random()); ?>" 
             <?php endif; ?>
             class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                'items-center gap-x-3 ps-3',
+                'fi-input-wrp-prefix items-center gap-x-3 ps-3',
                 'flex' => $hasPrefix,
                 'hidden' => ! $hasPrefix,
                 'pe-1' => $inlinePrefix && filled($prefix),
@@ -274,7 +274,7 @@ unset($__defined_vars); ?>
             wire:target="<?php echo e($loadingIndicatorTarget); ?>"
         <?php endif; ?>
         class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-            'min-w-0 flex-1',
+            'fi-input-wrp-input min-w-0 flex-1',
             'ps-3' => $hasLoadingIndicator && (! $hasPrefix) && $inlinePrefix,
         ]); ?>"
     >
@@ -285,7 +285,7 @@ unset($__defined_vars); ?>
     <!--[if BLOCK]><![endif]--><?php if($hasSuffix): ?>
         <div
             class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                'flex items-center gap-x-3 pe-3',
+                'fi-input-wrp-suffix flex items-center gap-x-3 pe-3',
                 'ps-1' => $inlineSuffix && filled($suffix),
                 'ps-2' => $inlineSuffix && blank($suffix),
                 'border-s border-gray-200 ps-3 dark:border-white/10' => ! $inlineSuffix,

@@ -206,4 +206,25 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::post('/mails', [App\Http\Controllers\InboundEmailController::class, 'handle']);
 
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\File;
+
+Route::get('/files/{filename}', function ($filename) {
+    // Define the path to the public directory where your files are located
+    $filePath = public_path('storage/' . $filename); // Ensure this is correct for your file location
+
+    // Check if the file exists
+    if (!File::exists($filePath)) {
+        return response()->json(['error' => 'File not found'], 404);
+    }
+
+    // Return the file with appropriate headers
+    return Response::file($filePath, [
+        'Content-Type' => mime_content_type($filePath),
+        'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
+        'Access-Control-Allow-Origin' => '*', // Or set specific origin
+        'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+        'Access-Control-Allow-Headers' => 'Content-Type, Authorization',
+    ]);
+});
 

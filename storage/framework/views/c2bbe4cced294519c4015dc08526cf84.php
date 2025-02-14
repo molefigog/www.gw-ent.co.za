@@ -162,7 +162,7 @@
     <!--[if BLOCK]><![endif]--><?php if($datalistOptions): ?>
         <datalist id="<?php echo e($id); ?>-list">
             <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $datalistOptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $option): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <option value="<?php echo e($option); ?>" />
+                <option value="<?php echo e($option); ?>"></option>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
         </datalist>
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
