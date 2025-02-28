@@ -46,7 +46,7 @@ class Music extends Model
 
     public function getImgAttribute()
     {
-        return $this->image ? asset("storage/{$this->image}") : 'https://via.placeholder.com/400x400';
+        return $this->image ? asset("storage/{$this->image}") : 'https://placehold.co/400x400.png';
     }
     public function getPreviewAttribute()
     {

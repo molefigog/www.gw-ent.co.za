@@ -241,6 +241,8 @@ Route::post('/check-music-file', [MusicController::class, 'checkFile'])->name('c
 //api routs
 Route::get('site-info/', [App\Http\Controllers\Api\SettingsController::class, 'siteInfo']);
 Route::get('music-index/', [App\Http\Controllers\Api\MusicController::class, 'musicIndex']);
+Route::get('genres-index/{genre}', [MusicController::class, 'genresIndex']);
+Route::get('genres-list/', [App\Http\Controllers\Api\MusicController::class, 'genresList']);
 // Route::get('track{slug}/', [MusicController::class, 'Trackview']);
 // Route in web.php or api.php
 Route::get('download/{trackId}', [App\Http\Controllers\Api\MusicController::class, 'downloadMp3']);

@@ -98,6 +98,7 @@ class Payment extends Component
             return redirect()->back();
         }
     }
+
     public function userMusic()
     {
         $music = Music::find($this->musicId);

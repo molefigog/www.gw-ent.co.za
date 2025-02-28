@@ -13,6 +13,7 @@ use App\Http\Requests\MusicEditRequest;
 use GuzzleHttp\Client;
 use App\Models\User;
 use App\Models\Music;
+use App\Models\Genre;
 use App\Models\Downloads;
 use Illuminate\Http\Request;
 use Exception;
@@ -24,13 +25,48 @@ class MusicController extends Controller
 
 
     public function musicIndex(Request $request): MusicCollection
-    {
-        $tracks = Music::latest()
+{
+    try {
 
-            ->paginate(18);
-
+        $tracks = Music::orderBy('created_at', 'desc')->get();
         return new MusicCollection($tracks);
+    } catch (\Exception $e) {
+
+        Log::error('Error fetching tracks: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to fetch tracks. Please try again later.'], 500);
     }
+}
+public function genresIndex($genre)
+    {
+        try {
+            // Fetch music tracks for the given genre
+            $tracks = Music::whereHas('genre', function ($query) use ($genre) {
+                $query->where('title', $genre);
+            })->get();
+
+            return response()->json([
+                'data' => $tracks
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch tracks.'], 500);
+        }
+    }
+public function genresList(Request $request)
+{
+    try {
+        // Fetch distinct genres from the Music table (assuming 'genre_title' is the column storing genres)
+        $genre = Genre::select('title')
+
+                        ->orderBy('title')
+                        ->get();
+
+        return response()->json($genre);
+    } catch (\Exception $e) {
+        Log::error('Error fetching genres: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to fetch genres. Please try again later.'], 500);
+    }
+}
+
 
     public function Trackview(Request $request, Music $track): MusicResource
     {
